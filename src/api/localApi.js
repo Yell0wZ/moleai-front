@@ -110,12 +110,9 @@ export const BusinessProfile = {
       // הוסף את businessId רק אם זה עסק משני (לא ראשי)
       if (businessId) {
         backendData.businessId = businessId;
-        console.log('BusinessProfile.create - Adding businessId for secondary business:', businessId);
       } else {
-        console.log('BusinessProfile.create - Creating primary business (no businessId)');
       }
       
-      console.log('BusinessProfile.create - Sending data to server:', backendData);
       const result = await BusinessProfileAPI.create(backendData);
       return transformBusinessProfileData.toFrontend(result);
     } catch (error) {
@@ -131,12 +128,9 @@ export const BusinessProfile = {
       // הוסף את businessId רק אם זה עסק משני (לא ראשי)
       if (businessId) {
         backendData.businessId = businessId;
-        console.log('BusinessProfile.update - Adding businessId for secondary business:', businessId);
       } else {
-        console.log('BusinessProfile.update - Updating primary business (no businessId)');
       }
       
-      console.log('BusinessProfile.update - Sending data to server:', backendData);
       const result = await BusinessProfileAPI.update(id, backendData);
       return transformBusinessProfileData.toFrontend(result);
     } catch (error) {
@@ -186,12 +180,19 @@ export const BusinessProfile = {
 
       const transformed = transformUserDataProfile.toFrontend(result);
       
+      console.log('=== BusinessProfile.getCurrentUser ===');
+      console.log('businessId:', businessId);
+      console.log('transformed.businessProfile:', transformed.businessProfile);
+      console.log('transformed.secondaryBusinesses:', transformed.secondaryBusinesses);
+      
       if (businessId === null) {
         // Return primary business profile
+        console.log('Returning primary business profile:', transformed.businessProfile);
         return transformed.businessProfile;
       } else {
         // Return secondary business profile
         const secondaryBusiness = transformed.secondaryBusinesses?.find(b => b.id === businessId);
+        console.log('Returning secondary business profile:', secondaryBusiness);
         return secondaryBusiness || null;
       }
     } catch (error) {
@@ -206,12 +207,9 @@ export const Persona = {
   list: async (sortBy, businessId = null) => {
     try {
       const uid = getCurrentUserUid();
-      console.log('Fetching user data for uid:', uid, 'businessId:', businessId);
       const result = await UserDataProfileAPI.getUserData(uid);
-      console.log('Raw getUserData result:', result);
 
       const transformed = transformUserDataProfile.toFrontend(result);
-      console.log('Transformed data:', transformed);
 
       let personas = [];
       
@@ -224,9 +222,6 @@ export const Persona = {
         personas = secondaryBusiness?.personas || [];
       }
       
-      console.log('Personas from transformed data:', personas);
-      console.log('Business profile personas:', transformed.businessProfile?.personas);
-      console.log('Top level personas:', transformed.personas);
 
       // Sort if requested
       if (sortBy) {
@@ -243,7 +238,6 @@ export const Persona = {
         });
       }
 
-      console.log('Final personas list:', personas);
       return personas;
     } catch (error) {
       console.error('Error getting personas:', error);
@@ -314,7 +308,6 @@ export const Persona = {
   createAI: async (count = 5, businessId = null) => {
     try {
       const uid = getCurrentUserUid();
-      console.log('Calling PersonaAPI.createAI with uid:', uid, 'count:', count, 'businessId:', businessId);
       
       const data = { uid, count };
       if (businessId) {
@@ -322,7 +315,6 @@ export const Persona = {
       }
       
       const result = await PersonaAPI.createAI(uid, count, data);
-      console.log('Raw API response from createAI:', result);
 
       // Check if the API returned an error
       if (result.ok === false) {
@@ -337,13 +329,10 @@ export const Persona = {
 
       // Transform the result to frontend format
       if (Array.isArray(personasArray)) {
-        console.log('Transforming personas array:', personasArray);
         const transformed = personasArray.map(persona => transformPersonaData.toFrontend(persona));
-        console.log('Transformed personas:', transformed);
         return transformed;
       }
       const transformed = [transformPersonaData.toFrontend(personasArray)];
-      console.log('Transformed single persona:', transformed);
       return transformed;
     } catch (error) {
       console.error('Error creating AI personas:', error);
@@ -363,45 +352,43 @@ export const Prompt = {
 
       let prompts = [];
       
+      console.log('=== Prompt.list ===');
+      console.log('businessId:', businessId);
+      console.log('transformed.prompts:', transformed.prompts);
+      console.log('transformed.businessProfile:', transformed.businessProfile);
+      
       if (businessId === null) {
         // Primary business prompts - filter by personas of primary business
         const primaryPersonas = transformed.businessProfile?.personas || [];
         const primaryPersonaIds = primaryPersonas.map(p => p.id || p.personaId);
         
-        console.log('Prompt.list - Primary business personas:', primaryPersonas);
-        console.log('Prompt.list - Primary business personaIds:', primaryPersonaIds);
+        console.log('primaryPersonas:', primaryPersonas);
+        console.log('primaryPersonaIds:', primaryPersonaIds);
         
         prompts = (transformed.prompts || []).filter(prompt => {
           // Include prompts that belong to primary business personas
           // or prompts without personaId (backward compatibility)
-          return !prompt.personaId || primaryPersonaIds.includes(prompt.personaId);
+          const matches = !prompt.personaId || primaryPersonaIds.includes(prompt.personaId);
+          console.log('Prompt:', prompt.id, 'personaId:', prompt.personaId, 'matches:', matches);
+          return matches;
         });
+        
+        console.log('Filtered prompts for primary business:', prompts);
       } else {
         // For secondary businesses, get prompts directly from the business
         const secondaryBusiness = transformed.secondaryBusinesses?.find(b => b.id === businessId);
-        console.log('Prompt.list - Secondary business found:', secondaryBusiness);
         
         if (secondaryBusiness && secondaryBusiness.prompts) {
           // Prompts are stored directly in the secondary business
           prompts = secondaryBusiness.prompts;
-          console.log('Prompt.list - Found prompts in secondary business:', prompts);
         } else {
           // Fallback: try to filter global prompts by businessId or personaId
           const secondaryPersonas = secondaryBusiness?.personas || [];
           const secondaryPersonaIds = secondaryPersonas.map(p => p.id || p.personaId);
           
-          console.log('Prompt.list - Secondary business personas:', secondaryPersonas);
-          console.log('Prompt.list - Secondary business personaIds:', secondaryPersonaIds);
-          console.log('Prompt.list - All prompts before filtering:', transformed.prompts);
           
           // Debug each prompt's personaId and businessId
           transformed.prompts.forEach((prompt, index) => {
-            console.log(`Prompt.list - Prompt ${index} personaId:`, prompt.personaId);
-            console.log(`Prompt.list - Prompt ${index} personaId type:`, typeof prompt.personaId);
-            console.log(`Prompt.list - Prompt ${index} businessId:`, prompt.businessId);
-            console.log(`Prompt.list - Prompt ${index} businessId type:`, typeof prompt.businessId);
-            console.log(`Prompt.list - Prompt ${index} personaId in secondaryPersonaIds:`, secondaryPersonaIds.includes(prompt.personaId));
-            console.log(`Prompt.list - Prompt ${index} businessId matches:`, prompt.businessId === businessId);
           });
           
           prompts = (transformed.prompts || []).filter(prompt => {
@@ -430,8 +417,6 @@ export const Prompt = {
         });
       }
 
-      console.log('Prompt.list - businessId:', businessId);
-      console.log('Prompt.list - filtered prompts:', prompts);
       return prompts;
     } catch (error) {
       console.error('Error getting prompts:', error);
@@ -444,8 +429,6 @@ export const Prompt = {
 
   create: async (data, businessId = null) => {
     try {
-      console.log('Prompt.create - data:', data);
-      console.log('Prompt.create - businessId:', businessId);
       
       const uid = getCurrentUserUid();
       const frontendData = {
@@ -453,23 +436,17 @@ export const Prompt = {
         uid
       };
       
-      console.log('Prompt.create - frontendData before transform:', frontendData);
       
       const backendData = transformAiPromptData.toBackend(frontendData);
-      console.log('Prompt.create - backendData after transform:', backendData);
 
       // Add businessId if provided (for secondary businesses)
       if (businessId) {
         backendData.businessId = businessId;
-        console.log('Prompt.create - Added businessId to backendData:', backendData);
       }
 
-      console.log('Prompt.create - Final backendData being sent:', backendData);
       const result = await AiPromptAPI.create(backendData);
-      console.log('Prompt.create - Result from backend:', result);
 
       const frontendResult = transformAiPromptData.toFrontend(result);
-      console.log('Prompt.create - Final frontend result:', frontendResult);
       return frontendResult;
     } catch (error) {
       console.error('Error creating AI prompt:', error);

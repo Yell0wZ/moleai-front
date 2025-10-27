@@ -32,11 +32,9 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
   
   // Debug state changes
   useEffect(() => {
-    console.log('showResponseModal changed to:', showResponseModal);
   }, [showResponseModal]);
   
   useEffect(() => {
-    console.log('selectedPrompt changed to:', selectedPrompt);
   }, [selectedPrompt]);
   const navigate = useNavigate();
 
@@ -76,7 +74,6 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
   };
 
   const handleViewResponses = (prompt) => {
-    console.log('handleViewResponses called with prompt:', prompt);
     setSelectedPrompt(prompt);
     setShowResponseModal(true);
   };
@@ -147,13 +144,33 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
       />
 
       {/* Mobile-only Send Button */}
-      <div className="block sm:hidden">
+      <div className="block lg:hidden">
         <Button
           onClick={() => setShowSendModal(true)}
-          className={`bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-base w-full h-12 ${isRTL ? 'flex-row-reverse' : ''}`}
+          className={`relative bg-gradient-to-r from-sky-500 via-blue-500 to-blue-600 hover:from-sky-600 hover:via-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-500 text-lg w-full h-16 overflow-hidden group ${isRTL ? 'flex-row-reverse' : ''}`}
         >
-          <Send className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          {t('prompts.sendNew')}
+          {/* Continuous lightning animation */}
+          <div className="absolute inset-0 -top-1 -bottom-1 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 animate-lightning"></div>
+          
+          {/* Hover lightning animation */}
+          <div className="absolute inset-0 -top-1 -bottom-1 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+          
+          <Send className={`w-6 h-6 relative z-10 ${isRTL ? 'ml-3' : 'mr-3'}`} />
+          <span className="relative z-10">{t('prompts.sendNew')}</span>
+          
+          <style jsx>{`
+            @keyframes lightning {
+              0%, 90%, 100% {
+                transform: translateX(-100%) skewX(-12deg);
+              }
+              5%, 10% {
+                transform: translateX(100%) skewX(-12deg);
+              }
+            }
+            .animate-lightning {
+              animation: lightning 3s ease-in-out infinite;
+            }
+          `}</style>
         </Button>
       </div>
 
@@ -162,29 +179,29 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+        className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 xs:gap-4"
       >
-        <Card className="bg-gradient-to-br from-sky-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-3 sm:p-4 lg:p-6">
+        <Card className="bg-gradient-to-br from-sky-500 via-blue-500 to-blue-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group">
+          <CardContent className="p-3 xs:p-4 lg:p-6">
             <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
               {isHebrew ? (
                 <>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 xs:w-10 xs:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <MessageSquare className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-right">{stats.totalPrompts}</div>
-                    <div className="text-sky-100 text-xs sm:text-sm font-medium text-right">{t('prompts.totalPrompts')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold text-right">{stats.totalPrompts}</div>
+                    <div className="text-sky-100 text-xs xs:text-sm font-medium text-right">{t('prompts.totalPrompts')}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{stats.totalPrompts}</div>
-                    <div className="text-sky-100 text-xs sm:text-sm font-medium">{t('prompts.totalPrompts')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold">{stats.totalPrompts}</div>
+                    <div className="text-sky-100 text-xs xs:text-sm font-medium">{t('prompts.totalPrompts')}</div>
                   </div>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 xs:w-10 xs:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <MessageSquare className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                 </>
               )}
@@ -192,27 +209,27 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-sky-400 to-blue-500 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-3 sm:p-4 lg:p-6">
+        <Card className="bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group">
+          <CardContent className="p-3 xs:p-4 lg:p-6">
             <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
               {isHebrew ? (
                 <>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-right">{stats.completedPrompts}</div>
-                    <div className="text-sky-100 text-xs sm:text-sm font-medium text-right">{t('prompts.completed')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold text-right">{stats.completedPrompts}</div>
+                    <div className="text-sky-100 text-xs xs:text-sm font-medium text-right">{t('prompts.completed')}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{stats.completedPrompts}</div>
-                    <div className="text-sky-100 text-xs sm:text-sm font-medium">{t('prompts.completed')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold">{stats.completedPrompts}</div>
+                    <div className="text-sky-100 text-xs xs:text-sm font-medium">{t('prompts.completed')}</div>
                   </div>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                 </>
               )}
@@ -221,26 +238,26 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
         </Card>
         
         <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-3 sm:p-4 lg:p-6">
+          <CardContent className="p-3 xs:p-4 lg:p-6">
             <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
               {isHebrew ? (
                 <>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-right">{stats.pendingPrompts}</div>
-                    <div className="text-blue-100 text-xs sm:text-sm font-medium text-right">{t('prompts.pending')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold text-right">{stats.pendingPrompts}</div>
+                    <div className="text-blue-100 text-xs xs:text-sm font-medium text-right">{t('prompts.pending')}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{stats.pendingPrompts}</div>
-                    <div className="text-blue-100 text-xs sm:text-sm font-medium">{t('prompts.pending')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold">{stats.pendingPrompts}</div>
+                    <div className="text-blue-100 text-xs xs:text-sm font-medium">{t('prompts.pending')}</div>
                   </div>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                 </>
               )}
@@ -248,27 +265,27 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-3 sm:p-4 lg:p-6">
+        <Card className="bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group">
+          <CardContent className="p-3 xs:p-4 lg:p-6">
             <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
               {isHebrew ? (
                 <>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-right">{stats.totalMentions}</div>
-                    <div className="text-indigo-100 text-xs sm:text-sm font-medium text-right">{t('prompts.mentions')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold text-right">{stats.totalMentions}</div>
+                    <div className="text-indigo-100 text-xs xs:text-sm font-medium text-right">{t('prompts.mentions')}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{stats.totalMentions}</div>
-                    <div className="text-indigo-100 text-xs sm:text-sm font-medium">{t('prompts.mentions')}</div>
+                    <div className="text-xl xs:text-2xl lg:text-3xl font-bold">{stats.totalMentions}</div>
+                    <div className="text-indigo-100 text-xs xs:text-sm font-medium">{t('prompts.mentions')}</div>
                   </div>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/30 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-sm" />
                   </div>
                 </>
               )}
@@ -284,7 +301,7 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-2xl border border-white/20 bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse text-right' : ''} ${isHebrew ? 'justify-end' : ''}`}>
               {isHebrew ? (
@@ -315,7 +332,7 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
                 </p>
                 <Button
                   onClick={() => setShowSendModal(true)}
-                  className={`bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`bg-gradient-to-r from-sky-500 via-blue-500 to-blue-600 hover:from-sky-600 hover:via-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
                   <Send className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                   {t('prompts.sendFirstBtn')}
@@ -337,7 +354,6 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
       <PromptResponseModal
         isOpen={showResponseModal}
         onClose={() => {
-          console.log('Closing response modal');
           setShowResponseModal(false);
         }}
         prompt={selectedPrompt}

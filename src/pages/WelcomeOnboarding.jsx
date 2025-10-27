@@ -134,21 +134,16 @@ export default function WelcomeOnboarding({ onComplete }) {
       setErrorMessage(null);
 
       // Generate a single AI persona
-      console.log('Creating AI persona...');
       const aiResponse = await PersonaAPI.createAI(1);
-      console.log('AI persona creation response:', aiResponse);
 
       // Wait a moment for database propagation
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      console.log('Fetching personas list...');
       const personas = await Persona.list('-created_date');
-      console.log('Personas fetched:', personas);
 
       if (personas && personas.length > 0) {
         // Get the most recently created persona (first one after sorting by -created_date)
         const latestPersona = personas[0];
-        console.log('Latest persona:', latestPersona);
 
         // Map database fields to form fields
         const mappedPersonaData = {
@@ -236,12 +231,9 @@ export default function WelcomeOnboarding({ onComplete }) {
         language: normalizedLanguage
       });
 
-      // Only set language if it's not already locked (to avoid overriding database preferences)
-      if (!languageLocked) {
-        const languageCode = normalizedLanguage === 'hebrew' ? 'he' : 'en';
-        setLanguage(languageCode);
-        lockLanguage();
-      }
+      const languageCode = normalizedLanguage === 'hebrew' ? 'he' : 'en';
+      setLanguage(languageCode);
+      lockLanguage();
 
       // Only set profileExists to true if we actually have a name (complete profile)
       if (prefs.name && prefs.name.trim()) {
@@ -265,17 +257,8 @@ export default function WelcomeOnboarding({ onComplete }) {
           }
         }
 
-        if (!preferences && user?.uid) {
-          // Load directly from Firestore
-          const docRef = doc(db, 'clients', user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const docData = docSnap.data();
-            if (docData.personal) {
-              preferences = docData.personal;
-            }
-          }
+        if (!preferences) {
+          preferences = await UserPreferences.get();
         }
 
         if (preferences) {
@@ -287,7 +270,7 @@ export default function WelcomeOnboarding({ onComplete }) {
     };
 
     loadUserPreferences();
-  }, [lockLanguage, setLanguage, languageLocked]);
+  }, [lockLanguage, setLanguage]);
 
   useEffect(() => {
     const determineStartingStep = async () => {
@@ -390,8 +373,37 @@ export default function WelcomeOnboarding({ onComplete }) {
             if (businessProfile.id) setBusinessProfileId(businessProfile.id);
           }
         } else {
-          // Has everything - go to success
-          startStep = 7;
+          // Check if we actually have personas in the database
+          if (firestoreData.personas && firestoreData.personas.length > 0) {
+            // Has everything including personas - go to success
+            startStep = 7;
+          } else {
+            // Has personal and business but no personas - go to persona step
+            startStep = 3;
+            
+            // Load business data
+            if (firestoreData.businessProfile) {
+              const businessProfile = firestoreData.businessProfile;
+              const normalizedCompetitors = Array.isArray(businessProfile.competitors)
+                ? businessProfile.competitors.map(comp => (typeof comp === 'string' ? comp : comp?.name)).filter(Boolean)
+                : [];
+              const normalizedProducts = Array.isArray(businessProfile.productsServices)
+                ? businessProfile.productsServices.join(', ')
+                : businessProfile.productsServices || "";
+
+              const mappedBusinessData = {
+                business_name: businessProfile.businessName || "",
+                description: businessProfile.businessDescription || "",
+                products_services: normalizedProducts,
+                target_market: businessProfile.targetMarket || "",
+                competitors: normalizedCompetitors,
+                industry: businessProfile.industry || "",
+              };
+
+              setBusinessData(() => ({ ...INITIAL_BUSINESS_DATA, ...mappedBusinessData }));
+              if (businessProfile.id) setBusinessProfileId(businessProfile.id);
+            }
+          }
         }
 
         // Set the starting step
@@ -567,29 +579,29 @@ export default function WelcomeOnboarding({ onComplete }) {
       products_services: businessData.products_services,
     };
 
-    try {
-      let savedProfile = null;
-      console.log('Saving business profile...');
-      if (businessProfileId) {
-        savedProfile = await BusinessProfile.update(businessProfileId, payload);
-      } else {
-        savedProfile = await BusinessProfile.create(payload);
-      }
+    // Proceed to next step immediately without waiting for API response
+    setPersonaPage(0);
+    setStep(3);
+    setIsSubmitting(false);
 
-      if (savedProfile?.id) {
-        setBusinessProfileId(savedProfile.id);
-      }
-      console.log('Business profile saved successfully');
+    // Submit in background without waiting
+    (async () => {
+      try {
+        let savedProfile = null;
+        if (businessProfileId) {
+          savedProfile = await BusinessProfile.update(businessProfileId, payload);
+        } else {
+          savedProfile = await BusinessProfile.create(payload);
+        }
 
-      // Proceed to next step after successful save
-      setPersonaPage(0);
-      setStep(3);
-    } catch (error) {
-      console.error("Business profile submission error:", error);
-      setErrorMessage(isHebrew ? 'שגיאה בשמירת פרופיל העסק. אנא ודא שכל השדות הנדרשים מלאים ונסה שוב.' : 'Error saving business profile. Please ensure all required fields are filled and try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+        if (savedProfile?.id) {
+          setBusinessProfileId(savedProfile.id);
+        }
+      } catch (error) {
+        console.error("Business profile submission error (background):", error);
+        // Don't show error to user since they've already moved on
+      }
+    })();
   };
 
   const handlePersonaPageNext = () => {
@@ -713,7 +725,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
   return (
     <div
-      className={`min-h-[100dvh] h-[100dvh] overflow-hidden flex items-center justify-center bg-gradient-to-br from-sky-50 via-white to-blue-100 px-4 py-12 ${isRTL ? 'rtl' : ''}`}
+      className={`h-[100dvh] overflow-hidden flex items-center justify-center bg-gradient-to-br from-sky-50 via-white to-blue-100 px-0 py-0 sm:px-4 sm:py-12 ${isRTL ? 'rtl' : ''}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* AI Generation Loading Overlay */}
@@ -741,16 +753,16 @@ export default function WelcomeOnboarding({ onComplete }) {
           </div>
         </div>
       )}
-      <div className="max-w-4xl w-full mx-auto">
+      <div className="max-w-4xl w-full h-full mx-auto sm:px-4">
         <motion.div
-          className="w-full"
+          className="w-full h-full"
           key={currentStepInfo.key}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -24 }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="overflow-hidden shadow-xl border-0 bg-white/90 backdrop-blur flex flex-col h-full max-h-full w-full">
+          <Card className="overflow-hidden shadow-xl border-0 bg-white/90 backdrop-blur flex flex-col h-full w-full rounded-none sm:rounded-2xl">
             <CardHeader 
               className={`border-b border-slate-100 bg-white/70 ${isHebrew ? 'text-right' : ''} shrink-0`}
               style={isHebrew ? { textAlign: 'right' } : {}}
@@ -806,7 +818,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
             {step === 1 && (
               <form onSubmit={handleProfileSubmit} className="flex flex-1 flex-col overflow-hidden" noValidate>
-                <CardContent className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-h-[calc(100vh-200px)]">
+                <CardContent className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6 min-h-0">
                   {errorMessage && (
                     <div className={`rounded-xl border border-red-100 bg-red-50 ${isRTL ? 'text-right' : ''} px-4 py-3 text-sm text-red-600`}>
                       {errorMessage}
@@ -857,9 +869,9 @@ export default function WelcomeOnboarding({ onComplete }) {
                   </div>
                 </CardContent>
 
-                <div className="border-t border-slate-200 bg-white/95 px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+                <div className="border-t border-slate-200 bg-white/95 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 mt-auto shrink-0">
                   {isHebrew ? (
-                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 w-full">
+                    <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-stretch sm:items-center gap-3 sm:gap-4 w-full">
                       <Button
                         type="button"
                         variant="ghost"
@@ -876,7 +888,7 @@ export default function WelcomeOnboarding({ onComplete }) {
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 w-full">
+                    <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-stretch sm:items-center gap-3 sm:gap-4 w-full">
                       <Button
                         type="button"
                         variant="ghost"

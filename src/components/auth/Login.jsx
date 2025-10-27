@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { signInWithPopup, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { auth, googleProvider } from '../../firebase';
 import { Mail, ArrowLeft, Check, Brain, BarChart3, Users, MessageSquare } from 'lucide-react';
 import { useFormValidation } from '../../hooks/useFormValidation';
@@ -8,12 +8,8 @@ import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [emailLinkSent, setEmailLinkSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { t, isRTL } = useLanguage();
@@ -22,51 +18,52 @@ const Login = () => {
     clearErrors, 
     clearFieldError, 
     validateFields, 
-    getFieldError,
-    validatePasswordMatch
+    getFieldError
   } = useFormValidation();
 
-  const handleEmailPasswordAuth = async (e) => {
+  // Handle email link verification on component mount
+  useEffect(() => {
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      // Retrieve the email from local storage
+      let email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+        // Prompt the user to enter their email if not available
+        email = window.prompt('Please provide your email for confirmation');
+      }
+      
+      if (email) {
+        signInWithEmailLink(auth, email, window.location.href)
+          .then((result) => {
+            // Clear the email from local storage
+            window.localStorage.removeItem('emailForSignIn');
+            // User is signed in - the AuthContext will handle the redirect
+            console.log('User signed in:', result.user);
+          })
+          .catch((error) => {
+            console.error('Error signing in with email link:', error);
+            setError('Invalid or expired sign-in link. Please try again.');
+            setTimeout(() => setError(''), 5000);
+          });
+      }
+    }
+  }, []);
+
+  const handlePasswordlessAuth = async (e) => {
     e.preventDefault();
     setError('');
     clearErrors();
 
-    // Validate form fields
+    // Validate email field
     const validationRules = {
       email: { 
         value: email, 
         required: true,
         email: true,
         customMessage: t('validation.emailRequired')
-      },
-      password: { 
-        value: password, 
-        required: true,
-        password: true,
-        customMessage: t('validation.passwordRequired')
       }
     };
 
-    // Add confirm password validation for sign up
-    if (isSignUp) {
-      validationRules.confirmPassword = { 
-        value: confirmPassword, 
-        required: true,
-        customMessage: t('validation.confirmPasswordRequired')
-      };
-    }
-
     const isValid = validateFields(validationRules);
-
-    // Additional password match validation for sign up
-    if (isSignUp && isValid) {
-      const passwordMatchError = validatePasswordMatch(password, confirmPassword);
-      if (passwordMatchError) {
-        setError(passwordMatchError);
-        setTimeout(() => setError(''), 3000);
-        return;
-      }
-    }
 
     if (!isValid) {
       return;
@@ -75,18 +72,20 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
+      const actionCodeSettings = {
+        url: window.location.origin + '/login',
+        handleCodeInApp: true,
+      };
+
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      
+      // Save the email locally to complete sign-in after redirection
+      window.localStorage.setItem('emailForSignIn', email);
+      setEmailLinkSent(true);
     } catch (error) {
-      if (!isSignUp && (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials')) {
-        setError('Email or password is incorrect');
-      } else {
-        setError('Error, please try again');
-      }
-      setTimeout(() => setError(''), 3000);
+      console.error('Error sending email link:', error);
+      setError('Error sending sign-in link. Please try again.');
+      setTimeout(() => setError(''), 5000);
     }
     
     setLoading(false);
@@ -106,37 +105,11 @@ const Login = () => {
     setLoading(false);
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    if (!email) {
-      setError('Please enter your email address');
-      setTimeout(() => setError(''), 3000);
-      return;
-    }
-
-    setError('');
-    setLoading(true);
-
-    try {
-      await sendPasswordResetEmail(auth, email);
-      setResetEmailSent(true);
-    } catch (error) {
-      setError('Error, please try again');
-      setTimeout(() => setError(''), 3000);
-    }
-    
-    setLoading(false);
-  };
-
   const resetForm = () => {
     setEmail('');
-    setPassword('');
-    setConfirmPassword('');
     setError('');
-    setIsSignUp(false);
     setShowEmailForm(false);
-    setIsForgotPassword(false);
-    setResetEmailSent(false);
+    setEmailLinkSent(false);
   };
 
   return (
@@ -191,24 +164,21 @@ const Login = () => {
           
           <div className="login-header">
             <h1>
-              {isForgotPassword 
-                ? (resetEmailSent ? 'Check your email' : 'Reset password')
+              {emailLinkSent 
+                ? 'Check your email'
                 : showEmailForm 
-                  ? (isSignUp ? 'Create your account' : 'Sign in to your account')
+                  ? 'Sign in to your account'
                   : 'Welcome to Mole.AI'
               }
             </h1>
-            {isForgotPassword && resetEmailSent && (
+            {emailLinkSent && (
               <p className="reset-success-message">
-                We've sent a password reset link to {email}
+                We've sent a sign-in link to {email}. Click the link in your email to sign in.
               </p>
             )}
-            {showEmailForm && !isForgotPassword && (
+            {showEmailForm && !emailLinkSent && (
               <p className="login-subtitle">
-                {isSignUp 
-                  ? 'Join Mole.AI to unlock powerful AI-driven insights'
-                  : 'Enter your credentials to access your dashboard'
-                }
+                Enter your email address to receive a secure sign-in link
               </p>
             )}
           </div>
@@ -219,7 +189,7 @@ const Login = () => {
           </div>
         )}
 
-        {!isForgotPassword && !showEmailForm && (
+        {!showEmailForm && !emailLinkSent && (
           <div className="login-buttons">
             <button 
               onClick={handleGoogleSignIn}
@@ -236,7 +206,7 @@ const Login = () => {
             </button>
 
             <button 
-              onClick={() => {setShowEmailForm(true); setIsSignUp(false);}}
+              onClick={() => setShowEmailForm(true)}
               className="auth-button email-button"
               disabled={loading}
             >
@@ -246,114 +216,36 @@ const Login = () => {
           </div>
         )}
 
-        {isForgotPassword ? (
-          <>
-            {resetEmailSent ? (
-              <div className="reset-success">
-                <div className="success-icon">
-                  <Check className="w-8 h-8" />
-                </div>
-                <div className="auth-switch">
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="link-button"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to login
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <form onSubmit={handleForgotPassword} className="login-form">
-                  <div className="form-group">
-                    <input
-                      id="reset-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email address"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    className="auth-button submit-button"
-                    disabled={loading}
-                  >
-                    {loading ? 'Sending...' : 'Send reset link'}
-                  </button>
-                </form>
-                
-                <div className="auth-switch">
-                  <button
-                    type="button"
-                    onClick={() => {setIsForgotPassword(false); setError('');}}
-                    className="link-button"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to login
-                  </button>
-                </div>
-              </>
-            )}
-          </>
+        {emailLinkSent ? (
+          <div className="reset-success">
+            <div className="success-icon">
+              <Check className="w-8 h-8" />
+            </div>
+            <div className="auth-switch">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="link-button"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to login
+              </button>
+            </div>
+          </div>
         ) : (
           showEmailForm && (
             <>
-              <form onSubmit={handleEmailPasswordAuth} className="login-form">
+              <form onSubmit={handlePasswordlessAuth} className="login-form">
                 <div className="form-group">
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder="Enter your email address"
                     required
                     disabled={loading}
                   />
-                </div>
-
-                <div className="form-group">
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    disabled={loading}
-                    minLength="6"
-                  />
-                </div>
-
-                {isSignUp && (
-                  <div className="form-group">
-                    <input
-                      id="confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm your password"
-                      required
-                      disabled={loading}
-                      minLength="6"
-                    />
-                  </div>
-                )}
-
-                <div className="forgot-password">
-                  <button
-                    type="button"
-                    onClick={() => setIsForgotPassword(true)}
-                    className="link-button forgot-link"
-                    disabled={loading}
-                  >
-                    Forgot password?
-                  </button>
                 </div>
 
                 <button 
@@ -361,27 +253,14 @@ const Login = () => {
                   className="auth-button submit-button"
                   disabled={loading}
                 >
-                  {loading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+                  {loading ? 'Sending...' : 'Send sign-in link'}
                 </button>
-                
-                {!isSignUp && (
-                  <div className="signup-prompt-inline">
-                    <button
-                      type="button"
-                      onClick={() => {setIsSignUp(true); setError('');}}
-                      className="signup-button-inline"
-                      disabled={loading}
-                    >
-                      New here? Sign Up
-                    </button>
-                  </div>
-                )}
               </form>
               
               <div className="auth-switch">
                 <button
                   type="button"
-                  onClick={() => {setShowEmailForm(false); setEmail(''); setPassword(''); setConfirmPassword(''); setError('');}}
+                  onClick={() => {setShowEmailForm(false); setEmail(''); setError('');}}
                   className="link-button"
                   disabled={loading}
                 >

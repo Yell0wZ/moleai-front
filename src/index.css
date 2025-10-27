@@ -161,25 +161,29 @@ button:focus-visible {
 
 /* Business Profile - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
-  .business-profile-desktop-shift {
+  .business-profile-desktop-shift,
+  .profile-page-desktop-shift {
     transform: translateX(-60px) !important;
   }
 }
 
 @media (min-width: 1280px) and (max-width: 1366px) {
-  .business-profile-desktop-shift {
+  .business-profile-desktop-shift,
+  .profile-page-desktop-shift {
     transform: translateX(-80px) !important;
   }
 }
 
 @media (min-width: 1366px) and (max-width: 1440px) {
-  .business-profile-desktop-shift {
+  .business-profile-desktop-shift,
+  .profile-page-desktop-shift {
     transform: translateX(-90px) !important;
   }
 }
 
 @media (min-width: 1440px) {
-  .business-profile-desktop-shift {
+  .business-profile-desktop-shift,
+  .profile-page-desktop-shift {
     transform: translateX(-100px) !important;
   }
 }
@@ -407,7 +411,8 @@ button:focus-visible {
 /* English site only - move content 20px to the right */
 @media (min-width: 1466px) and (max-width: 1466px) and (min-height: 912px) and (max-height: 912px) {
   /* Only apply to English site (LTR direction) */
-  [dir="ltr"] .business-profile-desktop-shift {
+  [dir="ltr"] .business-profile-desktop-shift,
+  [dir="ltr"] .profile-page-desktop-shift {
     transform: translateX(20px) !important;
   }
   
@@ -431,7 +436,8 @@ button:focus-visible {
 /* ===== 14-INCH SCREEN ADJUSTMENTS (1024px-1600px) ===== */
 @media (min-width: 1024px) and (max-width: 1600px) {
   /* Only apply to English site (LTR direction) */
-  [dir="ltr"] .business-profile-desktop-shift {
+  [dir="ltr"] .business-profile-desktop-shift,
+  [dir="ltr"] .profile-page-desktop-shift {
     transform: translateX(10px) !important;
   }
   
@@ -452,7 +458,8 @@ button:focus-visible {
   }
   
   /* Only apply to Hebrew site (RTL direction) - shift 80px left */
-  [dir="rtl"] .business-profile-desktop-shift {
+  [dir="rtl"] .business-profile-desktop-shift,
+  [dir="rtl"] .profile-page-desktop-shift {
     transform: translateX(-180px) !important;
   }
   

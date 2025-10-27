@@ -10,27 +10,16 @@ export default function SentimentAnalysis({ prompts, businessProfile, businessId
     const sentiments = { positive: 0, neutral: 0, negative: 0 };
     
     // Debug: Log prompts structure
-    console.log('SentimentAnalysis - prompts:', prompts);
-    console.log('SentimentAnalysis - prompts length:', prompts.length);
     if (prompts.length > 0) {
-      console.log('SentimentAnalysis - first prompt:', prompts[0]);
-      console.log('SentimentAnalysis - first prompt keys:', Object.keys(prompts[0]));
       
       // Check if brandAnalysis exists in different locations
-      console.log('Checking for brandAnalysis in different locations:');
-      console.log('prompts[0][1]:', prompts[0][1]);
-      console.log('prompts[0].brandAnalysis:', prompts[0].brandAnalysis);
-      console.log('prompts[0].responses:', prompts[0].responses);
-      console.log('prompts[0].responses.brandAnalysis:', prompts[0].responses?.brandAnalysis);
     }
     
     prompts.forEach((prompt, index) => {
-      console.log(`Checking prompt ${index}:`);
       
       // Check for the correct structure: prompts[1].brandAnalysis.sentiment
       if (prompt[1]?.brandAnalysis?.sentiment) {
         const sentiment = prompt[1].brandAnalysis.sentiment.toLowerCase();
-        console.log('Found sentiment in prompts[1]:', sentiment);
         if (sentiment === 'positive') {
           sentiments.positive++;
         } else if (sentiment === 'negative') {
@@ -42,7 +31,6 @@ export default function SentimentAnalysis({ prompts, businessProfile, businessId
       // Check if brandAnalysis is directly on the prompt
       else if (prompt.brandAnalysis?.sentiment) {
         const sentiment = prompt.brandAnalysis.sentiment.toLowerCase();
-        console.log('Found sentiment in prompt.brandAnalysis:', sentiment);
         if (sentiment === 'positive') {
           sentiments.positive++;
         } else if (sentiment === 'negative') {
@@ -91,10 +79,6 @@ export default function SentimentAnalysis({ prompts, businessProfile, businessId
     const total = Object.values(sentiments).reduce((sum, count) => sum + count, 0);
     
     // Debug: Log sentiment counts
-    console.log('SentimentAnalysis - Positive count:', sentiments.positive);
-    console.log('SentimentAnalysis - Neutral count:', sentiments.neutral);
-    console.log('SentimentAnalysis - Negative count:', sentiments.negative);
-    console.log('SentimentAnalysis - Total prompts:', total);
     
     return {
       positive: { count: sentiments.positive, percentage: total > 0 ? (sentiments.positive / total * 100).toFixed(1) : 0 },

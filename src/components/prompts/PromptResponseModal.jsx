@@ -121,13 +121,8 @@ const highlightText = (text, brandName, competitors) => {
 };
 
 export default function PromptResponseModal({ isOpen, onClose, prompt }) {
-  console.log('PromptResponseModal rendered with:', { isOpen, prompt });
-  console.log('Prompt responses:', prompt?.responses);
-  console.log('Prompt responses keys:', prompt?.responses ? Object.keys(prompt.responses) : 'No responses');
   if (prompt?.responses) {
     Object.entries(prompt.responses).forEach(([key, value]) => {
-      console.log(`Response ${key}:`, value ? value.substring(0, 100) + '...' : 'undefined');
-      console.log(`Response ${key} length:`, value ? value.length : 'undefined');
     });
   }
   const { user } = useAuth();

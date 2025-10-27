@@ -1,17 +1,12 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Sparkles, User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/components/common/LanguageProvider";
 
-export default function PersonaCard({ persona, index, onEdit, onDelete }) {
+export default function PersonaCard({ persona, index }) {
   const { t, isRTL, isHebrew } = useLanguage();
-
-  const handleDelete = () => {
-    onDelete(persona.id);
-  };
 
   return (
     <motion.div
@@ -80,26 +75,6 @@ export default function PersonaCard({ persona, index, onEdit, onDelete }) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-gray-100 flex gap-2 w-full">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(persona)}
-              className={`flex-1 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-300 transition-all duration-200 touch-optimized hover-optimized ${isRTL ? 'flex-row-reverse' : ''}`}
-            >
-              <Edit className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {isHebrew ? 'ערוך' : 'Edit'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDelete}
-              className={`flex-1 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all duration-200 touch-optimized hover-optimized ${isRTL ? 'flex-row-reverse' : ''}`}
-            >
-              <Trash2 className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {isHebrew ? 'מחק' : 'Delete'}
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </motion.div>

@@ -30,7 +30,9 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { LanguageProvider, useLanguage } from "@/components/common/LanguageProvider";
-import { BusinessProfile } from "@/api/entities";
+import { BusinessProfile, UserPreferences } from "@/api/entities";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 import {
   Select,
   SelectContent,
@@ -46,7 +48,7 @@ import { Business } from "@/api/entities";
 function LayoutContent({ children, currentPageName, businessId }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t, isRTL, isHebrew } = useLanguage();
+  const { t, isRTL, isHebrew, setLanguage, lockLanguage } = useLanguage();
   const { user, logout } = useAuth();
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState(() => {
@@ -68,6 +70,48 @@ function LayoutContent({ children, currentPageName, businessId }) {
   const [isCreateBusinessModalOpen, setIsCreateBusinessModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [deleteBusinessModal, setDeleteBusinessModal] = useState({ isOpen: false, businessId: null, businessName: '' });
+
+  // Load language from database when component mounts
+  useEffect(() => {
+    const loadLanguageFromDatabase = async () => {
+      try {
+        // Always load language from database on every refresh
+        // Load personal data directly from Firestore
+        if (user?.uid) {
+          const docRef = doc(db, 'clients', user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const docData = docSnap.data();
+            console.log('=== FIRESTORE RAW DATA ===');
+            console.log('Full Firestore document:', docData);
+            console.log('Firestore document keys:', Object.keys(docData || {}));
+            console.log('Personal field:', docData.personal);
+            console.log('Personal language:', docData.personal?.language);
+            console.log('=== END FIRESTORE RAW DATA ===');
+            
+            const personalData = docData.personal;
+            
+            if (personalData && personalData.language) {
+              const normalizedLanguage = personalData.language.toLowerCase().startsWith('he')
+                ? 'hebrew'
+                : 'english';
+              
+              const languageCode = normalizedLanguage === 'hebrew' ? 'he' : 'en';
+              setLanguage(languageCode);
+              lockLanguage();
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load language from database:', error);
+      }
+    };
+
+    if (user) {
+      loadLanguageFromDatabase();
+    }
+  }, [user, setLanguage, lockLanguage]);
 
   const navigationItems = useMemo(() => {
     const businessId = selectedBusinessId;
@@ -473,11 +517,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
   const mobileHeaderSubtitle = pageCopy.subtitle;
 
   const handleBusinessSwitch = (value) => {
-    console.log('Layout - handleBusinessSwitch called with value:', value);
     const newBusinessId = value === "primary" ? null : value;
-    console.log('Layout - newBusinessId:', newBusinessId);
-    console.log('Layout - newBusinessId type:', typeof newBusinessId);
-    console.log('Layout - newBusinessId === null:', newBusinessId === null);
     
     setSelectedBusinessId(newBusinessId);
     if (typeof window !== "undefined") {
@@ -496,7 +536,6 @@ function LayoutContent({ children, currentPageName, businessId }) {
       const isPrimary = value === "primary";
       
       const newUrl = createPageUrl(currentTab, newBusinessId, isPrimary);
-      console.log('Layout - Navigating to new URL:', newUrl);
       navigate(newUrl);
     }
     
@@ -601,22 +640,14 @@ function LayoutContent({ children, currentPageName, businessId }) {
     const handleBusinessProfileUpdate = (event) => {
       const { businessId: updatedBusinessId, businessName } = event.detail;
       
-      console.log('Received business-profile-updated event:', {
-        updatedBusinessId,
-        businessName,
-        currentBusinesses: businesses
-      });
-      
       // Update the business name in the businesses list
       setBusinesses(prev => {
         const updated = prev.map(business => {
           if (business.id === updatedBusinessId) {
-            console.log('Updating business:', business.id, 'from', business.name, 'to', businessName);
             return { ...business, name: businessName };
           }
           return business;
         });
-        console.log('Updated businesses list:', updated);
         return updated;
       });
     };
@@ -710,7 +741,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
     const items = navigationItems;
 
     return (
-      <nav className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-200 px-2 pt-2 pb-safe z-50 lg:hidden touch-optimized ${isRTL ? 'rtl' : 'ltr'}`}>
+      <nav className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-200 px-2 pt-2 pb-2 z-50 xl:hidden touch-optimized ${isRTL ? 'rtl' : 'ltr'}`}>
         <div className="flex justify-around items-center max-w-lg mx-auto">
           {items.map((item) => {
             const isActive = location.pathname === item.url;
@@ -1254,7 +1285,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
       
       <SidebarProvider>
         <div className={`flex w-full ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Sidebar side={isRTL ? "right" : "left"} className={`w-[280px] border-white/20 glass-morphism sidebar hidden lg:flex ${isRTL ? 'order-1' : 'order-1'} touch-optimized`}>
+          <Sidebar side={isRTL ? "right" : "left"} className={`w-[280px] border-white/20 glass-morphism sidebar ${isRTL ? 'order-1' : 'order-1'} touch-optimized hidden xl:flex`}>
             <SidebarHeader className="border-b border-white/10 p-6 sidebar-header">
               <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end text-right' : 'justify-start text-left'}`}>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
@@ -1393,7 +1424,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           </Sidebar>
 
           <main className={`flex-1 flex flex-col min-h-screen ${isRTL ? 'order-2' : 'order-2'}`}>
-            <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-4 py-4 lg:hidden sticky top-0 z-50">
+            <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-4 py-4 xl:hidden sticky top-0 z-50">
               <div className={`flex items-center justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 {/* Business Switcher */}
                 <div className={`flex-1 min-w-0 ${isRTL ? 'order-2' : 'order-1'}`}>
@@ -1430,10 +1461,6 @@ function LayoutContent({ children, currentPageName, businessId }) {
 
             <div className="flex-1 overflow-auto bottom-nav-padding lg:pb-0">
               {(() => {
-                console.log('Layout - Rendering children with businessId:', selectedBusinessId);
-                console.log('Layout - selectedBusinessId type:', typeof selectedBusinessId);
-                console.log('Layout - selectedBusinessId === null:', selectedBusinessId === null);
-                console.log('Layout - selectedBusinessId === "null":', selectedBusinessId === "null");
                 return React.cloneElement(children, { businessId: selectedBusinessId, refreshBusinessData });
               })()}
             </div>

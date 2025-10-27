@@ -14,10 +14,10 @@ import { format } from "date-fns";
 import { useLanguage } from "@/components/common/LanguageProvider";
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800",
-  analyzing: "bg-blue-100 text-blue-800", 
-  completed: "bg-green-100 text-green-800",
-  error: "bg-red-100 text-red-800"
+  pending: "bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200 shadow-sm",
+  analyzing: "bg-gradient-to-r from-blue-100 to-sky-100 text-blue-800 border border-blue-200 shadow-sm", 
+  completed: "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border border-emerald-200 shadow-sm",
+  error: "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200 shadow-sm"
 };
 
 export default function PromptHistoryTable({ prompts, onViewResponses }) {
@@ -26,9 +26,9 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
   return (
     <div className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mobile Card View */}
-      <div className="block sm:hidden space-y-3">
+      <div className="block lg:hidden space-y-4">
         {prompts.map((prompt) => (
-          <div key={prompt.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <div key={prompt.id} className="bg-white/90 backdrop-blur-sm border border-white/20 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 min-w-0">
                 <div className={`flex items-center gap-2 text-sm text-gray-600 mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -66,11 +66,10 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  console.log('View button clicked for prompt:', prompt);
                   onViewResponses(prompt);
                 }}
                 disabled={prompt.status !== 'completed'}
-                className={`hover:bg-blue-50 hover:text-blue-700 text-xs px-3 py-1 h-8 ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`bg-gradient-to-r from-sky-500/10 to-blue-500/10 hover:from-sky-500/20 hover:to-blue-500/20 border-sky-200 hover:border-sky-300 text-sky-700 hover:text-sky-800 text-xs px-4 py-2 h-9 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${isRTL ? 'flex-row-reverse' : ''}`}
               >
                 <Eye className={`w-3 h-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
                 {isHebrew ? "הצג" : "View"}
@@ -81,10 +80,10 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden sm:block overflow-x-auto">
+      <div className="hidden lg:block overflow-x-auto rounded-2xl border border-white/20 shadow-lg bg-white/90 backdrop-blur-sm">
         <Table className="min-w-full">
           <TableHeader>
-            <TableRow className="bg-gray-50">
+            <TableRow className="bg-gradient-to-r from-sky-50/50 to-blue-50/50 border-b border-white/20">
               <TableHead className={`min-w-[120px] ${isRTL ? 'text-right' : ''}`}>{isHebrew ? "תאריך" : "Date"}</TableHead>
               <TableHead className={`min-w-[120px] ${isRTL ? 'text-right' : ''}`}>{isHebrew ? "אווטאר" : "Avatar"}</TableHead>
               <TableHead className={`min-w-[200px] ${isRTL ? 'text-right' : ''}`}>{isHebrew ? "פרומפט" : "Prompt"}</TableHead>
@@ -95,7 +94,7 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
           </TableHeader>
           <TableBody>
             {prompts.map((prompt) => (
-              <TableRow key={prompt.id} className="hover:bg-gray-50">
+              <TableRow key={prompt.id} className="hover:bg-gradient-to-r hover:from-sky-50/30 hover:to-blue-50/30 transition-all duration-300 border-b border-white/10">
                 <TableCell className="min-w-[120px]">
                   <div className={`flex items-center gap-2 text-sm whitespace-nowrap ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -139,7 +138,7 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
                     size="sm"
                     onClick={() => onViewResponses(prompt)}
                     disabled={prompt.status !== 'completed'}
-                    className={`hover:bg-blue-50 hover:text-blue-700 text-xs px-2 py-1 h-8 whitespace-nowrap ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className={`bg-gradient-to-r from-sky-500/10 to-blue-500/10 hover:from-sky-500/20 hover:to-blue-500/20 border-sky-200 hover:border-sky-300 text-sky-700 hover:text-sky-800 text-xs px-3 py-2 h-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
                     <Eye className={`w-3 h-3 sm:w-4 sm:h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
                     <span className="hidden sm:inline">{isHebrew ? "הצג" : "View"}</span>

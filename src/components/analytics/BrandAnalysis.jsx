@@ -9,23 +9,9 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
   const { t, isRTL, isHebrew } = useLanguage();
 
   // Extract brandAnalysis data from prompts
-  // Check multiple possible locations for brandAnalysis data
   const brandAnalysisData = [];
-  
-  // Debug: Log prompts structure
-  console.log('BrandAnalysis - prompts:', prompts);
-  console.log('BrandAnalysis - prompts length:', prompts.length);
-  if (prompts.length > 0) {
-    console.log('BrandAnalysis - first prompt:', prompts[0]);
-    console.log('BrandAnalysis - first prompt brandAnalysis:', prompts[0].brandAnalysis);
-  }
-  
-  prompts.forEach((prompt, index) => {
-    console.log(`BrandAnalysis - Checking prompt ${index}:`);
-    console.log(`BrandAnalysis - prompt.brandAnalysis:`, prompt.brandAnalysis);
-    console.log(`BrandAnalysis - prompt[1]:`, prompt[1]);
-    console.log(`BrandAnalysis - prompt[0]:`, prompt[0]);
-    
+
+  prompts.forEach((prompt) => {
     // Check for brandAnalysis directly on the prompt
     if (prompt.brandAnalysis) {
       brandAnalysisData.push(prompt.brandAnalysis);
@@ -39,10 +25,6 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
       brandAnalysisData.push(prompt[0].brandAnalysis);
     }
   });
-  
-  // Debug: Log brandAnalysis data found
-  console.log('BrandAnalysis - brandAnalysisData found:', brandAnalysisData);
-  console.log('BrandAnalysis - brandAnalysisData length:', brandAnalysisData.length);
 
   // If no brand analysis data, show message
   if (brandAnalysisData.length === 0) {
@@ -105,8 +87,6 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
 
   // Use real counts data only
   const latestCounts = countsData[0] || {};
-  
-  console.log('BrandAnalysis - latestCounts:', latestCounts);
 
   // Get sentiment color and icon
   const getSentimentConfig = (sentiment) => {

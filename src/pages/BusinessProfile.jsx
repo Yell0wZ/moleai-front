@@ -59,7 +59,6 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
     setIsLoading(true);
 
     try {
-      console.log('BusinessProfile loadProfile - businessId:', businessId);
       
       const clientDocRef = doc(db, "clients", uid);
       const snapshot = await getDoc(clientDocRef);
@@ -76,7 +75,6 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
       if (businessId) {
         // Load secondary business by ID
         const secondaryBusinesses = rawData?.secondary_buisness || rawData?.secondary_business || [];
-        console.log('BusinessProfile loadProfile - secondaryBusinesses:', secondaryBusinesses);
         businessData = secondaryBusinesses.find(business => 
           business.id === businessId || 
           business.businessId === businessId || 
@@ -85,10 +83,8 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
       } else {
         // Load primary business
         businessData = rawData?.businessProfile || rawData?.business_profile || rawData;
-        console.log('BusinessProfile loadProfile - primary businessData:', businessData);
       }
       
-      console.log('BusinessProfile loadProfile - found businessData:', businessData);
 
       const competitors = Array.isArray(businessData?.competitors)
         ? businessData.competitors
@@ -195,10 +191,6 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
       // Use the businessId from the API response if available, otherwise use the current businessId
       const stableBusinessId = apiResponse?.businessId || businessId || profile?.id || "business-profile";
       
-      console.log('BusinessProfile save - API response:', apiResponse);
-      console.log('BusinessProfile save - stableBusinessId:', stableBusinessId);
-      console.log('BusinessProfile save - businessId prop:', businessId);
-      console.log('BusinessProfile save - apiResponse.businessId:', apiResponse?.businessId);
 
       const normalizedCompetitors = Array.isArray(formData.competitors)
         ? formData.competitors
@@ -213,10 +205,6 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
       }));
 
       if (typeof window !== "undefined" && stableBusinessId && formData.business_name) {
-        console.log('Dispatching business-profile-updated event:', {
-          businessId: stableBusinessId,
-          businessName: formData.business_name
-        });
         window.dispatchEvent(new CustomEvent("business-profile-updated", {
           detail: {
             businessId: stableBusinessId,
@@ -256,7 +244,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
   }
 
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6 lg:space-y-8 business-profile-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing ${isRTL ? 'text-right' : ''}`}>
+    <div className={`p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-8 business-profile-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing ${isRTL ? 'text-right' : ''}`}>
       <PageHeader
         icon={<Building2 className="w-8 h-8" />}
         title={t('business.title')}
@@ -267,7 +255,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
           <Button
             onClick={handleSubmit}
             disabled={isSaving}
-            className={`hidden sm:inline-flex h-12 px-6 text-base font-semibold ${sharedSaveButtonClasses}`}
+            className={`hidden sm:inline-flex h-12 px-8 text-base font-semibold ${sharedSaveButtonClasses}`}
           >
             <SaveButtonContent />
           </Button>
@@ -278,12 +266,13 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
+        className="space-y-6"
       >
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm responsive-card">
-          <CardHeader className="pb-6">
+        {/* Basic Information Section */}
+        <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-sky-50 to-blue-50 border-b border-sky-100">
             <CardTitle 
-              className={`flex items-center gap-3 card-title responsive-card-title ${isRTL ? 'flex-row-reverse text-right justify-end' : 'justify-start'}`}
-              style={isRTL ? { justifyContent: 'flex-end', direction: 'rtl' } : {}}
+              className={`flex items-center gap-3 text-xl font-bold text-gray-800 ${isRTL ? 'flex-row-reverse text-right justify-end' : 'justify-start'}`}
             >
               {isRTL ? (
                 <>
@@ -302,8 +291,8 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               <div className="sm:hidden">
                 <Button
                   type="submit"
@@ -314,9 +303,16 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 responsive-grid-2">
-                <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
-                  <Label htmlFor="business_name" className="text-sm font-semibold text-gray-700">
+              {/* Basic Information Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <motion.div 
+                  className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
+                  initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Label htmlFor="business_name" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-sky-500" />
                     {t('business.businessName')} *
                   </Label>
                   <Input
@@ -324,16 +320,25 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                     value={formData.business_name}
                     onChange={(e) => handleInputChange('business_name', e.target.value)}
                     placeholder={t('placeholder.businessName')}
-                    className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl form-input ${isRTL ? 'text-right' : ''} ${getFieldError('business_name') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
+                    className={`h-12 border-2 border-gray-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 rounded-xl transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('business_name') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                     dir="auto"
                   />
                   {getFieldError('business_name') && (
-                    <p className="mt-1 text-sm text-red-600">{getFieldError('business_name')}</p>
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {getFieldError('business_name')}
+                    </p>
                   )}
-                </div>
+                </motion.div>
                 
-                <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
-                  <Label htmlFor="industry" className="text-sm font-semibold text-gray-700">
+                <motion.div 
+                  className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
+                  initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Label htmlFor="industry" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-emerald-500" />
                     {t('business.industry')} *
                   </Label>
                   <Input
@@ -341,19 +346,29 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                     value={formData.industry}
                     onChange={(e) => handleInputChange('industry', e.target.value)}
                     placeholder={t('placeholder.industry')}
-                    className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl ${isRTL ? 'text-right' : ''} ${getFieldError('industry') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
+                    className={`h-12 border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 rounded-xl transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('industry') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                     dir="auto"
                   />
                   {getFieldError('industry') && (
-                    <p className="mt-1 text-sm text-red-600">{getFieldError('industry')}</p>
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {getFieldError('industry')}
+                    </p>
                   )}
-                </div>
+                </motion.div>
               </div>
 
 
 
-              <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
-                <Label htmlFor="description" className="text-sm font-semibold text-gray-700">
+              {/* Description Section */}
+              <motion.div 
+                className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Label htmlFor="description" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
                   {t('business.description')} *
                 </Label>
                 <Textarea
@@ -362,109 +377,155 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder={t('placeholder.description')}
                   rows={4}
-                  className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none ${isRTL ? 'text-right' : ''} ${getFieldError('description') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
+                  className={`border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 rounded-xl resize-none transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('description') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                   dir="auto"
                 />
                 {getFieldError('description') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('description')}</p>
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                    {getFieldError('description')}
+                  </p>
                 )}
+              </motion.div>
+
+              {/* Products & Services and Target Market Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <motion.div 
+                  className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
+                  initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Label htmlFor="products_services" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                    {t('business.productsServices')} *
+                  </Label>
+                  <Textarea
+                    id="products_services"
+                    value={formData.products_services}
+                    onChange={(e) => handleInputChange('products_services', e.target.value)}
+                    placeholder={t('placeholder.productsServices')}
+                    rows={3}
+                    className={`border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 rounded-xl resize-none transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('products_services') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                    dir="auto"
+                  />
+                  {getFieldError('products_services') && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {getFieldError('products_services')}
+                    </p>
+                  )}
+                </motion.div>
+
+                <motion.div 
+                  className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
+                  initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <Label htmlFor="target_market" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-teal-500 rounded-full"></span>
+                    {t('business.targetMarket')} *
+                  </Label>
+                  <Textarea
+                    id="target_market"
+                    value={formData.target_market}
+                    onChange={(e) => handleInputChange('target_market', e.target.value)}
+                    placeholder={t('placeholder.targetMarket')}
+                    rows={3}
+                    className={`border-2 border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/20 rounded-xl resize-none transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('target_market') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                    dir="auto"
+                  />
+                  {getFieldError('target_market') && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {getFieldError('target_market')}
+                    </p>
+                  )}
+                </motion.div>
               </div>
 
-              <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
-                <Label htmlFor="products_services" className="text-sm font-semibold text-gray-700">
-                  {t('business.productsServices')} *
-                </Label>
-                <Textarea
-                  id="products_services"
-                  value={formData.products_services}
-                  onChange={(e) => handleInputChange('products_services', e.target.value)}
-                  placeholder={t('placeholder.productsServices')}
-                  rows={3}
-                  className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none ${isRTL ? 'text-right' : ''} ${getFieldError('products_services') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
-                  dir="auto"
-                />
-                {getFieldError('products_services') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('products_services')}</p>
-                )}
-              </div>
-
-              <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
-                <Label htmlFor="target_market" className="text-sm font-semibold text-gray-700">
-                  {t('business.targetMarket')} *
-                </Label>
-                <Textarea
-                  id="target_market"
-                  value={formData.target_market}
-                  onChange={(e) => handleInputChange('target_market', e.target.value)}
-                  placeholder={t('placeholder.targetMarket')}
-                  rows={3}
-                  className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none ${isRTL ? 'text-right' : ''} ${getFieldError('target_market') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
-                  dir="auto"
-                />
-                {getFieldError('target_market') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('target_market')}</p>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <Label className={`text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {/* Competitors Section */}
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Label className={`text-sm font-semibold text-gray-700 flex items-center gap-2 ${isRTL ? 'text-right justify-end' : 'justify-start'}`}>
+                  <span className="w-2 h-2 bg-indigo-500 rounded-full"></span>
                   {t('business.competitors')} *
                 </Label>
-                <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Input
                     value={newCompetitor}
                     onChange={(e) => setNewCompetitor(e.target.value)}
                     placeholder={t('placeholder.addCompetitor')}
-                    className={`border-gray-200 focus:ring-2 focus:ring-blue-500/20 rounded-xl ${isRTL ? 'text-right' : ''} ${getFieldError('competitors') ? 'border-red-500 focus:border-red-500 focus:ring-red-500 ring-red-500' : ''}`}
+                    className={`flex-1 h-12 border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 rounded-xl transition-all duration-300 ${isRTL ? 'text-right' : ''} ${getFieldError('competitors') ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCompetitor())}
                     dir="auto"
                   />
                   <Button
                     type="button"
                     onClick={addCompetitor}
-                    className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 rounded-xl px-4"
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-xl px-6 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-5 h-5" />
                   </Button>
                 </div>
                 {getFieldError('competitors') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('competitors')}</p>
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                    {getFieldError('competitors')}
+                  </p>
                 )}
                 
                 {formData.competitors.length > 0 && (
-                  <div className={`flex flex-wrap gap-2 ${isRTL ? 'justify-end' : ''}`}>
+                  <div className={`flex flex-wrap gap-3 ${isRTL ? 'justify-end' : ''}`}>
                     {formData.competitors.map((competitor, index) => {
                       const competitorName = typeof competitor === 'string' ? competitor : competitor?.name || '';
                       return (
-                        <Badge
+                        <motion.div
                           key={index}
-                          variant="secondary"
-                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1 rounded-full"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
                         >
-                          <span className={isRTL ? 'ml-2' : 'mr-2'}>{competitorName}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeCompetitor(competitor)}
-                            className={`hover:text-red-500 transition-colors ${isRTL ? 'mr-2' : 'ml-2'}`}
+                          <Badge
+                            variant="secondary"
+                            className="bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 hover:from-indigo-100 hover:to-purple-100 px-4 py-2 rounded-full border border-indigo-200 shadow-sm hover:shadow-md transition-all duration-300"
                           >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
+                            <span className={isRTL ? 'ml-2' : 'mr-2'}>{competitorName}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeCompetitor(competitor)}
+                              className={`hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 ${isRTL ? 'mr-2' : 'ml-2'}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        </motion.div>
                       );
                     })}
                   </div>
                 )}
-              </div>
+              </motion.div>
 
-              <div className="pt-6">
+              {/* Save Button */}
+              <motion.div 
+                className="pt-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
                 <Button
                   type="submit"
                   disabled={isSaving}
-                  className={`w-full py-3 font-semibold text-base ${sharedSaveButtonClasses}`}
+                  className={`w-full py-4 font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 ${sharedSaveButtonClasses}`}
                 >
                   <SaveButtonContent />
                 </Button>
-              </div>
+              </motion.div>
             </form>
           </CardContent>
         </Card>

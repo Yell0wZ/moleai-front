@@ -184,7 +184,11 @@ export default function GeneratePersonasModal({
       
       setProgress(isHebrew ? `${personaCount} אווטארים נוצרו בהצלחה!` : `${personaCount} avatars created successfully!`);
       
-      onPersonasGenerated();
+      // Wait a moment to show success message, then close modal
+      setTimeout(() => {
+        onPersonasGenerated();
+        onClose();
+      }, 1500);
       
     } catch (error) {
       console.error("Error generating personas:", error);

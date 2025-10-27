@@ -41,25 +41,17 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
 
   const loadData = async () => {
     try {
-      console.log('Analytics - Starting loadData with currentBusinessId:', currentBusinessId);
-      
       // Load data based on current business context
       const [promptData, businessProfileExists, currentUserProfile] = await Promise.all([
         Prompt.list('-created_date', currentBusinessId),
         BusinessProfile.checkExists(currentBusinessId),
         BusinessProfile.getCurrentUser(currentBusinessId)
       ]);
-      
-      console.log('Analytics - currentBusinessId:', currentBusinessId);
-      console.log('Analytics - promptData:', promptData);
-      console.log('Analytics - promptData length:', promptData?.length);
-      console.log('Analytics - businessProfileExists:', businessProfileExists);
-      console.log('Analytics - currentUserProfile:', currentUserProfile);
-      
+
       // Prompts are already filtered by Prompt.list() based on personas
       // No additional filtering needed
       setPrompts(promptData);
-      
+
       if (businessProfileExists && currentUserProfile) {
         setBusinessProfile(currentUserProfile);
       } else {

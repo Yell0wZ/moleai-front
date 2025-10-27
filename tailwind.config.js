@@ -11,6 +11,7 @@ module.exports = {
   			'lg': '1024px',
   			'xl': '1280px',
   			'2xl': '1536px',
+  			'sidebar': '1300px',
   		},
   		spacing: {
   			'safe-top': 'env(safe-area-inset-top)',

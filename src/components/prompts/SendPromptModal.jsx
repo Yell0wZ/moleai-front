@@ -29,7 +29,6 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
   const [showLimitError, setShowLimitError] = useState(false);
   
   // Debug log to see personas data
-  console.log('SendPromptModal personas:', personas);
   const { 
     errors, 
     clearErrors, 
@@ -42,17 +41,13 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
     setSelectedPersona(personaId);
     clearFieldError('selectedPersona');
     const persona = personas.find(p => p.id === personaId);
-    console.log('Selected persona:', persona); // Debug log
-    console.log('Available fields:', Object.keys(persona || {})); // Debug log
     
     // Try multiple possible field names for the prompt template
     const promptTemplate = persona?.prompt_template || persona?.aiPrompt || persona?.ai_prompt || persona?.prompt;
     
     if (promptTemplate) {
       setPromptText(promptTemplate);
-      console.log('Set prompt text to:', promptTemplate); // Debug log
     } else {
-      console.log('No prompt template found for persona:', persona); // Debug log
     }
   };
 
@@ -176,10 +171,6 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
                 </SelectTrigger>
                 <SelectContent>
                   {personas.map((persona) => {
-                    console.log('Persona in dropdown:', persona); // Debug log
-                    console.log('Job title value:', persona.job_title); // Debug log
-                    console.log('JobTitle value:', persona.jobTitle); // Debug log
-                    console.log('All persona fields:', Object.keys(persona || {})); // Debug log
                     return (
                       <SelectItem key={persona.id} value={persona.id} className={isHebrew ? '!justify-end' : ''}>
                         <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''} ${isHebrew ? '!justify-end' : ''}`}>

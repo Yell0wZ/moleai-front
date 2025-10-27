@@ -47,10 +47,42 @@ export default function ProfilePage({ businessId }) {
     businesses: [],
     usage: null,
     lastUpdated: null,
+    rawDatabaseData: null,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const downloadDatabaseJSON = () => {
+    console.log('Download button clicked!');
+    console.log('Raw database data:', state.rawDatabaseData);
+    console.log('State:', state);
+    
+    // Try to get fresh data from Firestore if not available
+    if (!state.rawDatabaseData) {
+      console.log('No raw data in state, trying to fetch fresh data...');
+      fetchProfileData(true);
+      setTimeout(() => {
+        if (state.rawDatabaseData) {
+          downloadDatabaseJSON();
+        } else {
+          alert(isHebrew ? 'אין נתוני דטה בייס זמינים' : 'No database data available');
+        }
+      }, 1000);
+      return;
+    }
+
+    const dataStr = JSON.stringify(state.rawDatabaseData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `database-data-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const fetchProfileData = useCallback(
     async (showFullLoading = false) => {
@@ -175,10 +207,20 @@ export default function ProfilePage({ businessId }) {
 
         if (clientSnapshot.exists()) {
           const clientData = clientSnapshot.data() || {};
+          
+          // Save raw database data for download
+          console.log('Saving raw database data:', clientData);
+          console.log('Client data keys:', Object.keys(clientData || {}));
+          setState(prev => {
+            console.log('Previous state:', prev);
+            const newState = {
+              ...prev,
+              rawDatabaseData: clientData
+            };
+            console.log('New state:', newState);
+            return newState;
+          });
 
-          console.log('Profile - clientData:', clientData);
-          console.log('Profile - secondary_buisness:', clientData.secondary_buisness);
-          console.log('Profile - secondary_business:', clientData.secondary_business);
 
           usageData =
             clientData.usage ||
@@ -198,11 +240,9 @@ export default function ProfilePage({ businessId }) {
 
           // Load secondary businesses from the correct field
           const secondaryBusinesses = clientData.secondary_buisness || clientData.secondary_business || [];
-          console.log('Profile - secondaryBusinesses array:', secondaryBusinesses);
 
           if (Array.isArray(secondaryBusinesses)) {
             secondaryBusinesses.forEach((business, index) => {
-              console.log(`Profile - processing secondary business ${index}:`, business);
               mergeBusiness(
                 normalizeBusiness(business, `${clientSnapshot.id}-secondary-${index}`, {
                   source: "secondary",
@@ -251,9 +291,6 @@ export default function ProfilePage({ businessId }) {
           return a.isPrimary ? -1 : 1;
         });
 
-        console.log('Profile - final businesses array:', businesses);
-        console.log('Profile - primary businesses:', businesses.filter(b => b.isPrimary));
-        console.log('Profile - secondary businesses:', businesses.filter(b => !b.isPrimary));
 
         setState({
           loading: false,
@@ -325,7 +362,7 @@ export default function ProfilePage({ businessId }) {
   }
 
   return (
-    <div className={`p-4 sm:p-6 pt-12 md:pt-6 md:pl-8 max-w-5xl mx-auto space-y-6 ${isRTL ? "text-right" : ""}`}>
+    <div className={`p-4 sm:p-6 pt-12 md:pt-6 md:pl-8 max-w-5xl mx-auto space-y-6 profile-page-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing ${isRTL ? "text-right" : ""}`}>
       <PageHeader
         title={t("profile.title")}
         subtitle={t("profile.subtitle")}
@@ -333,20 +370,35 @@ export default function ProfilePage({ businessId }) {
         showOnMobile={false}
         actions={
           user?.uid ? (
-            <Button
-              onClick={handleRefresh}
-              disabled={loading || isRefreshing}
-              className={`inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-6 py-2 text-white shadow-md transition hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
-            >
-              {isRefreshing ? (
-                <Lordicon size="sm" variant="white" />
-              ) : (
-                <RefreshCcw className="h-4 w-4" />
-              )}
-              <span>{isRefreshing ? (isHebrew ? "טוען..." : "Loading...") : (isHebrew ? "רענן" : "Refresh")}</span>
-            </Button>
+            <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <Button
+                onClick={handleRefresh}
+                disabled={loading || isRefreshing}
+                className={`inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-6 py-2 text-white shadow-md transition hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                {isRefreshing ? (
+                  <Lordicon size="sm" variant="white" />
+                ) : (
+                  <RefreshCcw className="h-4 w-4" />
+                )}
+                <span>{isRefreshing ? (isHebrew ? "טוען..." : "Loading...") : (isHebrew ? "רענן" : "Refresh")}</span>
+              </Button>
+              
+              <Button
+                onClick={downloadDatabaseJSON}
+                variant="outline"
+                className={`inline-flex items-center gap-2 rounded-xl border-2 border-green-500 text-green-600 hover:bg-green-50 px-6 py-2 shadow-md transition hover:shadow-lg ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>{isHebrew ? "הורד JSON" : "Download JSON"}</span>
+              </Button>
+            </div>
           ) : null
         }
       />

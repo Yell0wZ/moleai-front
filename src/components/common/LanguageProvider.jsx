@@ -1,7 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
-import { useAuth } from '@/contexts/AuthContext';
 
 const LanguageContext = createContext();
 
@@ -557,7 +554,6 @@ const translations = {
 };
 
 export function LanguageProvider({ children }) {
-  const { user } = useAuth();
   const [language, setLanguage] = useState(() => {
     if (typeof window === 'undefined') {
       return 'en';
@@ -575,43 +571,6 @@ export function LanguageProvider({ children }) {
     }
     return localStorage.getItem('language-locked') === 'true';
   });
-
-  // Load language from Firestore on mount
-  useEffect(() => {
-    const loadLanguageFromFirestore = async () => {
-      try {
-        // Always try to load from Firestore if user is available, and override localStorage if different
-        if (user?.uid) {
-          const docRef = doc(db, 'clients', user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const docData = docSnap.data();
-            if (docData.personal && docData.personal.language) {
-              const firestoreLanguage = docData.personal.language.toLowerCase();
-              const normalizedLanguage = firestoreLanguage.startsWith('he') ? 'he' : 'en';
-              const currentLanguage = localStorage.getItem('app-language');
-              
-              // If Firestore language is different from localStorage, update it
-              if (currentLanguage !== normalizedLanguage) {
-                console.log('Language mismatch detected. Firestore:', firestoreLanguage, 'LocalStorage:', currentLanguage);
-                console.log('Updating language to:', normalizedLanguage);
-                setLanguage(normalizedLanguage);
-                // Clear the language lock to allow the update
-                localStorage.removeItem('language-locked');
-              } else {
-                console.log('Language already in sync:', normalizedLanguage);
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load language from Firestore:', error);
-      }
-    };
-
-    loadLanguageFromFirestore();
-  }, [user]);
 
   useEffect(() => {
     localStorage.setItem('app-language', language);
@@ -636,14 +595,6 @@ export function LanguageProvider({ children }) {
     }
   };
 
-  const clearLanguageCache = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('app-language');
-      localStorage.removeItem('language-locked');
-      console.log('Language cache cleared, will reload from Firestore');
-    }
-  };
-
   return (
     <LanguageContext.Provider value={{
       language,
@@ -653,7 +604,6 @@ export function LanguageProvider({ children }) {
       isHebrew,
       languageLocked,
       lockLanguage,
-      clearLanguageCache,
       t
     }}>
       {children}

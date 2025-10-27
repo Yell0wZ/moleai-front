@@ -50,10 +50,6 @@ export default function CreatePersonaModal({
 
   useEffect(() => {
     if (editingPersona) {
-      console.log('Editing persona data:', editingPersona);
-      console.log('Job title:', editingPersona.job_title);
-      console.log('Pain points:', editingPersona.pain_points);
-      console.log('Purchasing habits:', editingPersona.purchasing_habits);
       setFormData(editingPersona);
     } else {
       setFormData({
@@ -73,10 +69,8 @@ export default function CreatePersonaModal({
   }, [editingPersona]);
 
   const handleInputChange = (field, value) => {
-    console.log(`Updating field ${field} with value:`, value);
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      console.log('New form data:', newData);
       return newData;
     });
     // Clear field error when user starts typing

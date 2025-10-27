@@ -59,9 +59,6 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
         BusinessProfile.getCurrentUser(currentBusinessId)
       ]);
       
-      console.log('Competitor - currentBusinessId:', currentBusinessId);
-      console.log('Competitor - promptData:', promptData);
-      console.log('Competitor - currentUserProfile:', currentUserProfile);
 
       // Prompts are already filtered by Prompt.list() based on personas
       // No additional filtering needed

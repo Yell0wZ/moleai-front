@@ -21,21 +21,17 @@ const apiCall = async (endpoint, method = 'GET', data = null) => {
 
     if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
       options.body = JSON.stringify(data);
-      console.log('apiCall - Request body:', options.body);
     }
 
 
     const response = await fetch(url, options);
     
     // Debug response headers
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
     
     // Check for content-length header
     const contentLength = response.headers.get('content-length');
     if (contentLength) {
-      console.log('Content-Length header:', contentLength);
+      // Content-Length header available
     }
     
     if (!response.ok) {
@@ -52,34 +48,25 @@ const apiCall = async (endpoint, method = 'GET', data = null) => {
 
     // Get response text first to debug
     const responseText = await response.text();
-    console.log('Raw response text length:', responseText.length);
-    console.log('Raw response text preview:', responseText.substring(0, 200) + '...');
     
     // Check if response is truncated
     if (responseText.length < 1000) {
-      console.log('WARNING: Response seems too short, might be truncated');
-      console.log('Full response text:', responseText);
+      // Response might be truncated
     }
     
     // Parse JSON
     let result;
     try {
       result = JSON.parse(responseText);
-      console.log('API Response received:', result);
-      console.log('API Response size:', JSON.stringify(result).length);
     } catch (parseError) {
       console.error('JSON Parse Error:', parseError);
-      console.log('Response text that failed to parse:', responseText);
       throw parseError;
     }
     
     // Debug specific responses if they exist
     if (result.prompts && result.prompts.length > 0) {
-      console.log('First prompt responses:', result.prompts[0]?.responses);
       if (result.prompts[0]?.responses) {
         Object.entries(result.prompts[0].responses).forEach(([key, value]) => {
-          console.log(`Response ${key} length:`, value ? value.length : 'undefined');
-          console.log(`Response ${key} preview:`, value ? value.substring(0, 100) + '...' : 'undefined');
         });
       }
     }
@@ -169,12 +156,17 @@ export const BusinessProfileAPI = {
 export const UserDataProfileAPI = {
   // Get all user data (business profile + personas)
   getUserData: async (uid) => {
-    console.log('UserDataProfileAPI.getUserData - uid:', uid);
     const endpoint = `https://getuserdataprofile-thg3z73fma-uc.a.run.app/user-data-profile/${uid}`;
-    console.log('UserDataProfileAPI.getUserData - endpoint:', endpoint);
     const result = await apiCall(endpoint, 'GET');
-    console.log('UserDataProfileAPI.getUserData - result:', result);
-    console.log('UserDataProfileAPI.getUserData - result keys:', Object.keys(result || {}));
+    console.log('=== RAW DATABASE DATA ===');
+    console.log('Full database response:', result);
+    console.log('Database response keys:', Object.keys(result || {}));
+    if (result?.data) {
+      console.log('Database data keys:', Object.keys(result.data || {}));
+      console.log('Personal data:', result.data.personal);
+      console.log('Business profile:', result.data.business_profile);
+    }
+    console.log('=== END RAW DATABASE DATA ===');
     return result;
   }
 };
@@ -212,11 +204,8 @@ export const PersonaAPI = {
 export const AiPromptAPI = {
   // Create AI prompt
   create: async (promptData) => {
-    console.log('AiPromptAPI.create - promptData:', promptData);
     const endpoint = 'https://aipromts-thg3z73fma-uc.a.run.app';
-    console.log('AiPromptAPI.create - endpoint:', endpoint);
     const result = await apiCall(endpoint, 'POST', promptData);
-    console.log('AiPromptAPI.create - result:', result);
     return result;
   }
 };
@@ -352,10 +341,6 @@ export const transformAiPromptData = {
   // Transform backend data to frontend format
   toFrontend: (backendData) => {
     // Debug logging for responses
-    console.log('Backend data responses:', backendData.responses);
-    console.log('Backend data keys:', Object.keys(backendData));
-    console.log('Backend data businessId:', backendData.businessId);
-    console.log('Backend data personaId:', backendData.personaId);
     
     const transformed = {
       id: backendData.id || backendData._id,
@@ -379,8 +364,6 @@ export const transformAiPromptData = {
       updated_date: backendData.updatedAt ? new Date(backendData.updatedAt._seconds * 1000) : new Date()
     };
 
-    console.log('Transformed responses:', transformed.responses);
-    console.log('Transformed sources:', transformed.sources);
     return transformed;
   }
 };
@@ -388,11 +371,8 @@ export const transformAiPromptData = {
 export const transformUserDataProfile = {
   // Transform backend user data to frontend format
   toFrontend: (backendData) => {
-    console.log('transformUserDataProfile.toFrontend - backendData:', backendData);
-    console.log('transformUserDataProfile.toFrontend - backendData.ok:', backendData.ok);
     
     if (!backendData.ok) {
-      console.log('transformUserDataProfile.toFrontend - backendData.ok is false, returning empty data');
       return {
         businessProfile: null,
         secondaryBusinesses: [],
@@ -404,14 +384,8 @@ export const transformUserDataProfile = {
 
     // Handle both formats: backendData.data (old) and direct properties (new)
     const dataSource = backendData.data || backendData;
-    console.log('transformUserDataProfile.toFrontend - dataSource:', dataSource);
-    const { business_profile, secondary_buisness, personas, prompts, competitors, user_profile } = dataSource;
+    const { business_profile, secondary_buisness, personas, prompts, competitors, user_profile, personal } = dataSource;
     
-    console.log('transformUserDataProfile.toFrontend - business_profile:', business_profile);
-    console.log('transformUserDataProfile.toFrontend - secondary_buisness:', secondary_buisness);
-    console.log('transformUserDataProfile.toFrontend - personas:', personas);
-    console.log('transformUserDataProfile.toFrontend - prompts:', prompts);
-    console.log('transformUserDataProfile.toFrontend - competitors:', competitors);
 
     // Handle competitors - they might be strings or objects
     let transformedCompetitors = [];
@@ -447,10 +421,15 @@ export const transformUserDataProfile = {
       }));
     }
 
+    console.log('=== TRANSFORMING USER DATA ===');
+    console.log('business_profile:', business_profile);
+    console.log('secondary_buisness:', secondary_buisness);
+    console.log('=== END TRANSFORMING ===');
+    
     const transformedData = {
-      userProfile: user_profile ? {
-        name: user_profile.first_name || user_profile.name || "",
-        language: (user_profile.language || user_profile.preferred_language || "english").toLowerCase()
+      userProfile: (personal || user_profile) ? {
+        name: (personal || user_profile).first_name || (personal || user_profile).name || "",
+        language: ((personal || user_profile).language || (personal || user_profile).preferred_language || "english").toLowerCase()
       } : null,
       businessProfile: business_profile ? {
         ...transformBusinessProfileData.toFrontend(business_profile),
@@ -463,9 +442,6 @@ export const transformUserDataProfile = {
       competitors: transformedCompetitors
     };
     
-    console.log('transformUserDataProfile.toFrontend - final transformed data:', transformedData);
-    console.log('transformUserDataProfile.toFrontend - transformed prompts count:', transformedData.prompts.length);
-    console.log('transformUserDataProfile.toFrontend - transformed secondary businesses count:', transformedData.secondaryBusinesses.length);
     
     return transformedData;
   }
