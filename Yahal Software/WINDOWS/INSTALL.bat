@@ -3,9 +3,24 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 REM 
-cd /d "%~dp0..\.."
+where node >nul 2>nul
+if %errorlevel% neq 0 (
+    echo Node.js is not installed!
+    echo Please install Node.js 22 from: https://nodejs.org/
+    echo Or install nvm-windows from: https://github.com/coreybutler/nvm-windows
+    pause
+    exit /b 1
+)
 
 REM 
+echo Checking Node.js version...
+node --version
+echo.
+
+REM 
+cd /d "%~dp0..\.."
+
+REM
 echo Installing npm packages...
 call npm install
 
@@ -24,26 +39,15 @@ if %errorlevel% equ 0 (
         echo ⚠ Warning: Some global packages installation failed ^(may require administrator^)
     )
 
-    REM 
+    REM
     echo.
-    echo Running mcp auth...
-    call mcp auth
+    echo Running mcp login...
+    call mcp login
 
     if %errorlevel% equ 0 (
-        echo ✓ mcp auth completed successfully!
-
-        REM
-        echo.
-        echo Running mcp login...
-        call mcp login
-
-        if %errorlevel% equ 0 (
-            echo ✓ mcp login completed successfully!
-        ) else (
-            echo ⚠ Warning: mcp login failed
-        )
+        echo ✓ mcp login completed successfully!
     ) else (
-        echo ⚠ Warning: mcp auth failed
+        echo ⚠ Warning: mcp login failed
     )
 
     echo.

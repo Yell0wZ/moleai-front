@@ -253,26 +253,26 @@
 
 @media (min-width: 1366px) and (max-width: 1600px) {
   [dir="rtl"] .persona-card {
-    min-height: 260px !important;
-    max-height: 300px !important;
-    transform: scale(0.85) translateX(-30px) !important;
-    width: 300px !important;
-    max-width: 300px !important;
-    min-width: 300px !important;
+    min-height: 320px !important;
+    max-height: none !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    min-width: 320px !important;
     margin: 0 auto !important;
   }
   
   [dir="rtl"] .persona-card .card-content {
-    padding: 0.75rem !important;
-    min-height: 180px !important;
+    padding: 1rem !important;
+    min-height: 200px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
   }
   
   [dir="rtl"] .persona-card .card-content p {
-    font-size: 0.8rem !important;
-    line-height: 1.3 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
     text-align: right !important;
     direction: rtl !important;
     width: 100% !important;
@@ -282,20 +282,20 @@
   }
   
   [dir="rtl"] .persona-card .card-header {
-    padding: 0.5rem 0.75rem 0.25rem 0.75rem !important;
+    padding: 0.75rem 1rem 0.35rem 1rem !important;
     text-align: right !important;
   }
   
   [dir="rtl"] .persona-card .card-header h3 {
     text-align: right !important;
     direction: rtl !important;
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
   }
   
   [dir="rtl"] .persona-card .card-header p {
     text-align: right !important;
     direction: rtl !important;
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -304,20 +304,20 @@
   [dir="rtl"] .persona-card .card-content h4 {
     text-align: right !important;
     direction: rtl !important;
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important;
     font-weight: 600 !important;
   }
   
   [dir="rtl"] .persona-card .card-content .flex {
-    gap: 0.375rem !important;
-    padding-top: 0.5rem !important;
+    gap: 0.5rem !important;
+    padding-top: 0.75rem !important;
     margin-top: auto !important;
   }
   
   [dir="rtl"] .persona-card .card-content button {
-    font-size: 0.75rem !important;
-    padding: 0.375rem 0.5rem !important;
-    min-height: 32px !important;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.75rem !important;
+    min-height: 36px !important;
   }
 }
 
