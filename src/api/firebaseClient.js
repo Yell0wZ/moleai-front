@@ -82,7 +82,7 @@ const apiCall = async (endpoint, method = 'GET', data = null) => {
 export const BusinessProfileAPI = {
   // Create business profile
   create: async (profileData) => {
-    const endpoint = 'https://businessprofiledata-thg3z73fma-uc.a.run.app/business-profile';
+    const endpoint = 'https://businessprofiledata-p54weh4vrq-uc.a.run.app/business-profile';
     return await apiCall(endpoint, 'POST', profileData);
   },
 
@@ -116,13 +116,13 @@ export const BusinessProfileAPI = {
 
   // Update business profile (backend currently expects POST)
   update: async (id, profileData) => {
-    const endpoint = `https://businessprofiledata-thg3z73fma-uc.a.run.app/business-profile/`;
+    const endpoint = `https://businessprofiledata-p54weh4vrq-uc.a.run.app/business-profile/`;
     return await apiCall(endpoint, 'POST', profileData);
   },
 
   // Delete business profile (if you have a DELETE endpoint)
   delete: async (id) => {
-    const endpoint = `https://businessprofiledata-thg3z73fma-uc.a.run.app/business-profile/`;
+    const endpoint = `https://businessprofiledata-p54weh4vrq-uc.a.run.app/business-profile/`;
     return await apiCall(endpoint, 'DELETE');
   },
 
@@ -132,7 +132,7 @@ export const BusinessProfileAPI = {
   checkExists: async (uid) => {
     try {
       // Try to get the business profile - if it exists, return it
-      const endpoint = `https://businessprofiledata-thg3z73fma-uc.a.run.app/business-profile/`;
+      const endpoint = `https://businessprofiledata-p54weh4vrq-uc.a.run.app/business-profile/`;
       const result = await apiCall(endpoint, 'GET');
       return {
         exists: true,
@@ -155,8 +155,8 @@ export const BusinessProfileAPI = {
 // User Data Profile API
 export const UserDataProfileAPI = {
   // Get all user data (business profile + personas)
-  getUserData: async (uid) => {
-    const endpoint = `https://getuserdataprofile-thg3z73fma-uc.a.run.app/user-data-profile/${uid}`;
+  getUserData: async (_uid) => {
+    const endpoint = 'https://getuserdataprofile-p54weh4vrq-uc.a.run.app/user-data-profile';
     const result = await apiCall(endpoint, 'GET');
     console.log('=== RAW DATABASE DATA ===');
     console.log('Full database response:', result);
@@ -175,25 +175,25 @@ export const UserDataProfileAPI = {
 export const PersonaAPI = {
   // Create manual persona
   createManual: async (personaData) => {
-    const endpoint = 'https://createmanualpersona-thg3z73fma-uc.a.run.app/personas/manual';
+    const endpoint = 'https://createmanualpersona-p54weh4vrq-uc.a.run.app/personas/manual';
     return await apiCall(endpoint, 'POST', personaData);
   },
 
   // Edit persona
   edit: async (uid, personaId, personaData) => {
-    const endpoint = `https://editpersona-thg3z73fma-uc.a.run.app/personas/${personaId}`;
+    const endpoint = `https://editpersona-p54weh4vrq-uc.a.run.app/personas/${personaId}`;
     return await apiCall(endpoint, 'POST', personaData);
   },
 
   // Delete persona
   delete: async (uid, personaId, customUrl = null) => {
-    const endpoint = customUrl || `https://deletepersona-thg3z73fma-uc.a.run.app/personas/${personaId}`;
+    const endpoint = customUrl || `https://deletepersona-p54weh4vrq-uc.a.run.app/personas/${personaId}`;
     return await apiCall(endpoint, 'DELETE');
   },
 
   // Create AI personas
   createAI: async (uid, count, data = null) => {
-    const endpoint = 'https://createaipersona-thg3z73fma-uc.a.run.app';
+    const endpoint = 'https://createaipersona-p54weh4vrq-uc.a.run.app';
     const requestData = data || { uid, count };
     const result = await apiCall(endpoint, 'POST', requestData);
     return result;
@@ -204,7 +204,7 @@ export const PersonaAPI = {
 export const AiPromptAPI = {
   // Create AI prompt
   create: async (promptData) => {
-    const endpoint = 'https://aipromts-thg3z73fma-uc.a.run.app';
+    const endpoint = 'https://aipromts-p54weh4vrq-uc.a.run.app';
     const result = await apiCall(endpoint, 'POST', promptData);
     return result;
   }
@@ -214,21 +214,21 @@ export const AiPromptAPI = {
 export const CompetitorAPI = {
   // Create competitor
   create: async (competitorData) => {
-    const endpoint = 'https://createcompetitor-thg3z73fma-uc.a.run.app/competitors';
+    const endpoint = 'https://createcompetitor-p54weh4vrq-uc.a.run.app/competitors';
     const result = await apiCall(endpoint, 'POST', competitorData);
     return result;
   },
 
   // Create multiple competitors (bulk operation)
   createBulk: async (competitorsData) => {
-    const endpoint = 'https://createcompetitor-thg3z73fma-uc.a.run.app/competitors';
+    const endpoint = 'https://createcompetitor-p54weh4vrq-uc.a.run.app/competitors';
     const result = await apiCall(endpoint, 'POST', competitorsData);
     return result;
   },
 
   // Delete competitor
   delete: async (competitorData) => {
-    const endpoint = 'https://deletecompetitor-thg3z73fma-uc.a.run.app/competitors/delete';
+    const endpoint = 'https://deletecompetitor-p54weh4vrq-uc.a.run.app/competitors/delete';
     
     const result = await apiCall(endpoint, 'POST', competitorData);
     return result;
@@ -236,7 +236,7 @@ export const CompetitorAPI = {
 
   // Delete multiple competitors (bulk operation)
   deleteBulk: async (competitorsData) => {
-    const endpoint = 'https://deletecompetitor-thg3z73fma-uc.a.run.app/competitors/delete';
+    const endpoint = 'https://deletecompetitor-p54weh4vrq-uc.a.run.app/competitors/delete';
     
     const result = await apiCall(endpoint, 'POST', competitorsData);
     return result;
@@ -247,7 +247,7 @@ export const CompetitorAPI = {
 export const BusinessAPI = {
   // Delete secondary business
   delete: async (businessData) => {
-    const endpoint = 'https://deletebuisness-thg3z73fma-uc.a.run.app/business/delete';
+    const endpoint = 'https://deletebuisness-p54weh4vrq-uc.a.run.app/business/delete';
     const result = await apiCall(endpoint, 'POST', businessData);
     return result;
   }
@@ -259,14 +259,14 @@ export const transformBusinessProfileData = {
   toBackend: (frontendData) => {
     return {
       uid: frontendData.uid || "",
-      businessName: frontendData.business_name,
-      industry: frontendData.industry,
-      website: frontendData.website,
-      businessDescription: frontendData.description,
+      businessName: frontendData.business_name || "",
+      industry: frontendData.industry || "",
+      website: frontendData.website || "",
+      businessDescription: frontendData.description || "",
       productsServices: Array.isArray(frontendData.products_services)
         ? frontendData.products_services
         : frontendData.products_services?.split(',').map(item => item.trim()) || [],
-      targetMarket: frontendData.target_market,
+      targetMarket: frontendData.target_market || "",
       competitors: frontendData.competitors || []
     };
   },
@@ -453,15 +453,15 @@ export const transformPersonaData = {
   toBackendManual: (frontendData, uid) => {
     return {
       uid: uid || "",
-      name: frontendData.name,
-      age: parseInt(frontendData.age) || 0,
-      jobTitle: frontendData.job_title,
-      goals: frontendData.goals,
-      painPoints: frontendData.pain_points,
-      lifestyle: frontendData.lifestyle,
-      motivations: frontendData.motivations,
-      purchasingHabits: frontendData.purchasing_habits,
-      backstory: frontendData.backstory,
+      name: frontendData.name || "",
+      age: frontendData.age ? parseInt(frontendData.age) : 0,
+      jobTitle: frontendData.job_title || "",
+      goals: frontendData.goals || "",
+      painPoints: frontendData.pain_points || "",
+      lifestyle: frontendData.lifestyle || "",
+      motivations: frontendData.motivations || "",
+      purchasingHabits: frontendData.purchasing_habits || "",
+      backstory: frontendData.backstory || "",
       aiPrompt: frontendData.prompt_template || ""
     };
   },

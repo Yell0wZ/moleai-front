@@ -98,7 +98,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
 
       const promptRecord = await Prompt.create(promptData, businessId);
 
-      onPromptSent();
+      onPromptSent(promptRecord);
       
     } catch (error) {
       console.error("Error sending prompt:", error);
@@ -110,7 +110,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
           errorMessage.includes("upgrade your plan")) {
         setShowLimitError(true);
       } else {
-        alert(isHebrew ? "שגיאה בעיבוד תגובת ה-AI. אנא ודא שפרופיל העסק שלך מלא עם שם עסק, תעשייה ומוצרים/שירותים. אנא נסה שוב." : "Error processing AI response. Please ensure your business profile is complete with business name, industry, and products/services. Please try again.");
+        alert(t('errors.aiProcessingFailed'));
       }
     }
     
@@ -178,7 +178,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
                           <span className={`font-medium ${isHebrew ? 'text-right' : ''}`}>
                             {persona.name}
                             {(persona.job_title || persona.jobTitle) && ` - ${persona.job_title || persona.jobTitle}`}
-                            {!persona.job_title && !persona.jobTitle && ' (No job title)'} {/* Debug indicator */}
+                            {!persona.job_title && !persona.jobTitle && ' (No job title)'}
                           </span>
                         </div>
                       </SelectItem>
@@ -239,7 +239,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
               </Button>
             </DialogFooter>
 
-            {/* Loading Overlay */}
+
             {isSending && (
               <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-50 rounded-3xl">
                 <div className="text-center space-y-4 p-6">
@@ -264,7 +264,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
         </DialogContent>
       </Dialog>
 
-      {/* Monthly Limit Error Modal */}
+
       <Dialog open={showLimitError} onOpenChange={setShowLimitError}>
         <DialogContent className="lg:max-w-md" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex h-full min-h-0 flex-col">
@@ -281,7 +281,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
             </DialogHeader>
           
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 min-h-0">
-            {/* Error Icon and Message */}
+
             <motion.div 
               className="text-center space-y-4"
               initial={{ opacity: 0, y: 20 }}
@@ -310,7 +310,7 @@ export default function SendPromptModal({ isOpen, onClose, onPromptSent, persona
               </div>
             </motion.div>
 
-            {/* Additional Info */}
+
             <motion.div 
               className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${isRTL ? 'text-right' : ''}`}
               initial={{ opacity: 0, y: 20 }}

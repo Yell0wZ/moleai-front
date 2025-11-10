@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Building2, Users, Sparkles, CheckCircle2, UserRound, Plus, CircleAlert } from "lucide-react";
+import { Building2, Users, Sparkles, CheckCircle2, UserRound, Plus, CircleAlert, Check, FileEdit, Eye, ClipboardCheck, UserCircle } from "lucide-react";
 import { BusinessProfile, Persona, UserPreferences } from "@/api/entities";
 import { Persona as PersonaAPI } from "@/api/localApi";
 import { doc, getDoc } from 'firebase/firestore';
@@ -40,6 +40,30 @@ const INITIAL_PERSONA_DATA = {
 
 const primaryCtaClass = "h-14 px-10 text-lg font-semibold shadow-lg hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-200";
 const secondaryCtaClass = "h-14 px-8 text-base font-medium";
+
+const mapPersonaForDisplay = (persona = {}) => {
+  const toString = (value) => (value === undefined || value === null ? "" : String(value).trim());
+  const isGenerated = Boolean(
+    persona.is_ai_generated ??
+    persona.isAiGenerated ??
+    persona.source === 'ai'
+  );
+
+  return {
+    name: toString(persona.name),
+    age: persona.age === undefined || persona.age === null || persona.age === ""
+      ? ""
+      : String(persona.age),
+    job_title: toString(persona.job_title ?? persona.jobTitle),
+    lifestyle: toString(persona.lifestyle),
+    goals: toString(persona.goals),
+    pain_points: toString(persona.pain_points ?? persona.painPoints),
+    motivations: toString(persona.motivations),
+    purchasing_habits: toString(persona.purchasing_habits ?? persona.purchasingHabits),
+    backstory: toString(persona.backstory),
+    is_ai_generated: isGenerated,
+  };
+};
 
 export default function WelcomeOnboarding({ onComplete }) {
   const { t, isRTL, isHebrew, setLanguage, lockLanguage } = useLanguage();
@@ -88,25 +112,31 @@ export default function WelcomeOnboarding({ onComplete }) {
     },
     {
       key: "personaIntro",
-      icon: Users,
+      icon: UserCircle,
       title: t("welcome.personaIntro.title"),
       subtitle: t("welcome.personaIntro.subtitle"),
     },
     {
       key: "persona",
-      icon: Users,
+      icon: FileEdit,
       title: t("welcome.persona.title"),
       subtitle: t("welcome.persona.subtitle"),
     },
     {
       key: "meetPersona",
-      icon: Users,
+      icon: Eye,
       title: generatedPersona ? t('welcome.meetPersona.title').replace('{name}', generatedPersona.name) : t('welcome.meetPersona.title').replace('{name}', 'Your Avatar'),
-      subtitle: t('welcome.meetPersona.subtitle'),
+      subtitle: t(
+        generatedPersona
+          ? (generatedPersona.is_ai_generated
+              ? 'welcome.meetPersona.subtitle'
+              : 'welcome.meetPersona.manualSubtitle')
+          : 'welcome.meetPersona.subtitle'
+      ),
     },
     {
       key: "businessReview",
-      icon: Building2,
+      icon: ClipboardCheck,
       title: t("welcome.businessReview.title"),
       subtitle: t("welcome.businessReview.subtitle"),
     },
@@ -159,16 +189,28 @@ export default function WelcomeOnboarding({ onComplete }) {
         };
 
         setGeneratedPersona(mappedPersonaData);
+        setPersonaData(mappedPersonaData);
         
         // Go to the meet persona screen
         setStep(5); // meetPersona step
       } else {
         console.error('No personas found in database after creation');
-        setErrorMessage(isHebrew ? 'שגיאה בעיבוד תגובת ה-AI. אנא ודא שפרופיל העסק שלך מלא עם שם עסק, תעשייה ומוצרים/שירותים. אנא נסה שוב.' : 'Error processing AI response. Please ensure your business profile is complete with business name, industry, and products/services. Please try again.');
+        setErrorMessage(t('errors.aiProcessingFailed'));
       }
     } catch (error) {
       console.error('Error generating AI persona:', error);
-      setErrorMessage(isHebrew ? 'שגיאה בעיבוד תגובת ה-AI. אנא ודא שפרופיל העסק שלך מלא עם שם עסק, תעשייה ומוצרים/שירותים. אנא נסה שוב.' : 'Error processing AI response. Please ensure your business profile is complete with business name, industry, and products/services. Please try again.');
+      let errorMsg = t('errors.aiProcessingFailed');
+      
+      // Check if error message contains specific information
+      if (error.message) {
+        if (error.message.includes('business profile') || error.message.includes('business name')) {
+          errorMsg = t('errors.aiProcessingFailed');
+        } else {
+          errorMsg = error.message;
+        }
+      }
+      
+      setErrorMessage(errorMsg);
     } finally {
       setIsGeneratingAI(false);
     }
@@ -432,18 +474,14 @@ export default function WelcomeOnboarding({ onComplete }) {
     event.preventDefault();
     clearAllErrors();
 
-    if (!profileData.name.trim()) {
-      setFieldError('profileName', t("welcome.errors.profileName"));
-      return;
-    }
-
+    // All fields are optional - no validation needed
     // Set language immediately and proceed to next step
     const nextLanguage = profileData.language === "hebrew" ? "he" : "en";
     setLanguage(nextLanguage);
     lockLanguage();
 
     const payload = {
-      name: profileData.name.trim(),
+      name: profileData.name.trim() || '',
       language: profileData.language,
     };
 
@@ -459,7 +497,7 @@ export default function WelcomeOnboarding({ onComplete }) {
           'Content-Type': 'application/json',
           ...(headers || {}),
         };
-        await fetch("https://personalset-thg3z73fma-uc.a.run.app", {
+        await fetch("https://personalset-p54weh4vrq-uc.a.run.app", {
           method: "POST",
           headers: requestHeaders,
           body: JSON.stringify(payload),
@@ -489,17 +527,7 @@ export default function WelcomeOnboarding({ onComplete }) {
         errors.description = t("welcome.errors.description");
       }
     }
-    if (page === 1) {
-      if (!businessData.products_services.trim()) {
-        errors.productsServices = t("welcome.errors.productsServices");
-      }
-      if (!businessData.target_market.trim()) {
-        errors.targetMarket = t("welcome.errors.targetMarket");
-      }
-      if (businessData.competitors.length === 0) {
-        errors.competitors = t("welcome.errors.competitors");
-      }
-    }
+    // Page 1 fields (products_services, target_market, competitors) are optional
     
     return Object.keys(errors).length > 0 ? errors : null;
   };
@@ -573,10 +601,14 @@ export default function WelcomeOnboarding({ onComplete }) {
     clearAllErrors();
     setIsSubmitting(true);
 
+    // Ensure all fields are included in payload, even if empty
     const payload = {
-      ...businessData,
-      competitors: businessData.competitors,
-      products_services: businessData.products_services,
+      business_name: businessData.business_name || "",
+      description: businessData.description || "",
+      products_services: businessData.products_services || "",
+      target_market: businessData.target_market || "",
+      competitors: Array.isArray(businessData.competitors) ? businessData.competitors : [],
+      industry: businessData.industry || "",
     };
 
     // Proceed to next step immediately without waiting for API response
@@ -641,22 +673,58 @@ export default function WelcomeOnboarding({ onComplete }) {
     clearAllErrors();
     setIsSubmitting(true);
 
-    try {
-      const personaPayload = {
-        ...personaData,
-        age: parseInt(personaData.age, 10) || 0,
-        is_ai_generated: false,
-      };
+    const personaPayload = {
+      ...personaData,
+      age: parseInt(personaData.age, 10) || 0,
+      is_ai_generated: false,
+    };
 
-      await Persona.create(personaPayload);
+    setGeneratedPersona(displayPersona);
+    setPersonaData(displayPersona);
+    setStep(5);
 
-      setStep(5);
-    } catch (error) {
-      console.error("Welcome onboarding error:", error);
-      setErrorMessage(t("welcome.errors.saving"));
-    } finally {
-      setIsSubmitting(false);
-    }
+    (async () => {
+      try {
+        const createdPersona = await Persona.create(personaPayload);
+        let normalized = createdPersona ? mapPersonaForDisplay(createdPersona) : null;
+
+        const hasDisplayData = (persona) =>
+          persona &&
+          (
+            persona.name ||
+            persona.job_title ||
+            persona.age ||
+            persona.goals ||
+            persona.pain_points
+          );
+
+        if (!hasDisplayData(normalized)) {
+          try {
+            // Give Firestore a moment to update then fetch latest personas
+            await new Promise((resolve) => setTimeout(resolve, 600));
+            const personas = await Persona.list('-created_date');
+            if (personas && personas.length > 0) {
+              normalized = mapPersonaForDisplay({
+                ...personas[0],
+                is_ai_generated: false,
+              });
+            }
+          } catch (listError) {
+            console.warn('Unable to refresh personas after creation:', listError);
+          }
+        }
+
+        if (hasDisplayData(normalized)) {
+          setGeneratedPersona(normalized);
+          setPersonaData(normalized);
+        }
+      } catch (error) {
+        console.error("Welcome onboarding error:", error);
+        setErrorMessage(t("welcome.errors.saving"));
+      } finally {
+        setIsSubmitting(false);
+      }
+    })();
   };
 
   const handleBusinessFormSubmit = async (event) => {
@@ -728,7 +796,7 @@ export default function WelcomeOnboarding({ onComplete }) {
       className={`h-[100dvh] overflow-hidden flex items-center justify-center bg-gradient-to-br from-sky-50 via-white to-blue-100 px-0 py-0 sm:px-4 sm:py-12 ${isRTL ? 'rtl' : ''}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      {/* AI Generation Loading Overlay */}
+
       {isGeneratingAI && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
@@ -763,6 +831,110 @@ export default function WelcomeOnboarding({ onComplete }) {
           transition={{ duration: 0.4 }}
         >
           <Card className="overflow-hidden shadow-xl border-0 bg-white/90 backdrop-blur flex flex-col h-full w-full rounded-none sm:rounded-2xl">
+
+            <div className={`px-4 sm:px-6 py-4 sm:py-6 bg-white border-b border-slate-100 shrink-0 overflow-x-auto ${isRTL ? 'rtl' : ''}`}>
+              <div className={`flex items-center justify-between min-w-max ${isRTL ? 'flex-row-reverse' : ''}`}>
+                {(isRTL ? [...stepConfig].reverse() : stepConfig)
+                  .filter((stepInfo) => stepInfo.key !== 'persona' && stepInfo.key !== 'meetPersona' && stepInfo.key !== 'businessReview')
+                  .map((stepInfo, index) => {
+                  // For RTL, reverse the index to match the visual order
+                  const actualIndex = stepConfig.findIndex(s => s.key === stepInfo.key);
+                  const StepIcon = stepInfo.icon;
+                  
+                  // Determine if step is completed or active
+                  // Steps 4 (persona) and 5 (meetPersona) are part of personaIntro
+                  // Step 6 (businessReview) is part of success
+                  let isCompleted = false;
+                  let isActive = false;
+                  
+                  if (stepInfo.key === 'intro') {
+                    isCompleted = step > 0;
+                    isActive = step === 0;
+                  } else if (stepInfo.key === 'profile') {
+                    isCompleted = step > 1;
+                    isActive = step === 1;
+                  } else if (stepInfo.key === 'business') {
+                    isCompleted = step > 2;
+                    isActive = step === 2;
+                  } else if (stepInfo.key === 'personaIntro') {
+                    // personaIntro is completed when we've passed persona and meetPersona (steps 4 and 5)
+                    isCompleted = step > 5;
+                    isActive = step >= 3 && step <= 5;
+                  } else if (stepInfo.key === 'success') {
+                    // success is active when we're in businessReview (step 6) or success (step 7)
+                    isCompleted = step > 7;
+                    isActive = step >= 6 && step <= 7;
+                  }
+                  
+                  // Get short label for each step
+                  const getStepLabel = (stepKey) => {
+                    if (isHebrew) {
+                      switch(stepKey) {
+                        case 'intro': return 'הקדמה';
+                        case 'profile': return 'פרופיל';
+                        case 'business': return 'עסק';
+                        case 'personaIntro': return 'אווטאר';
+                        case 'success': return 'סיום';
+                        default: return '';
+                      }
+                    } else {
+                      switch(stepKey) {
+                        case 'intro': return 'Intro';
+                        case 'profile': return 'Profile';
+                        case 'business': return 'Business';
+                        case 'personaIntro': return 'Avatar';
+                        case 'success': return 'Complete';
+                        default: return '';
+                      }
+                    }
+                  };
+                  
+                   return (
+                      <React.Fragment key={stepInfo.key}>
+                       <div className="flex flex-col items-center text-center">
+
+                         <div className={`relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 ${
+                           isCompleted 
+                             ? 'bg-blue-600 border-blue-600 text-white' 
+                             : isActive 
+                               ? 'bg-blue-600 border-blue-600 text-white ring-4 ring-blue-100' 
+                               : 'bg-white border-slate-300 text-slate-400'
+                         }`}>
+                           {isCompleted ? (
+                             <Check className="w-5 h-5 sm:w-6 sm:h-6" />
+                           ) : (
+                             <StepIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                           )}
+                         </div>
+
+                         <p className={`mt-2 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                           isCompleted || isActive
+                             ? 'text-blue-600' 
+                             : 'text-slate-400'
+                         }`}>
+                           {getStepLabel(stepInfo.key)}
+                         </p>
+                       </div>
+                       
+
+                       {index < stepConfig.filter(s => s.key !== 'persona' && s.key !== 'meetPersona' && s.key !== 'businessReview').length - 1 && (
+                         <div className={`flex-1 h-0.5 mx-2 sm:mx-4 transition-all duration-300 self-center ${
+                           isCompleted
+                             ? 'bg-blue-600' 
+                             : 'bg-slate-300'
+                         }`} 
+                         style={{
+                           marginTop: isRTL ? '-1.25rem' : '-1.25rem',
+                           marginBottom: isRTL ? '0' : '0'
+                         }}
+                         />
+                       )}
+                     </React.Fragment>
+                  );
+               })}
+              </div>
+            </div>
+
             <CardHeader 
               className={`border-b border-slate-100 bg-white/70 ${isHebrew ? 'text-right' : ''} shrink-0`}
               style={isHebrew ? { textAlign: 'right' } : {}}
@@ -824,6 +996,7 @@ export default function WelcomeOnboarding({ onComplete }) {
                       {errorMessage}
                     </div>
                   )}
+
 
                   <div className={`space-y-2 ${isHebrew ? 'text-right' : ''}`}>
                     <Label htmlFor="user_name">{t('welcome.profile.nameLabel')}</Label>
@@ -920,6 +1093,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
                   {businessPage === 0 && (
                     <>
+    
                       <div className="grid gap-6 md:grid-cols-2">
                         <div className={isHebrew ? 'text-right' : ''}>
                           <Label htmlFor="business_name">{t('business.businessName')} *</Label>
@@ -972,8 +1146,13 @@ export default function WelcomeOnboarding({ onComplete }) {
 
                   {businessPage === 1 && (
                     <>
+                      <div className={`rounded-xl border border-blue-100 bg-blue-50 ${isRTL ? 'text-right' : ''} px-4 py-3 text-sm text-blue-700`}>
+                        {isHebrew 
+                          ? 'כל שדה שתתמלאו יעזור לנו לדייק יותר בהבנת העסק שלכם'
+                          : 'Every field you fill out will help us better understand your business'}
+                      </div>
                       <div className={`space-y-2 ${isHebrew ? 'text-right' : ''}`}>
-                        <Label htmlFor="products_services">{t('business.productsServices')} *</Label>
+                        <Label htmlFor="products_services">{t('business.productsServices')}</Label>
                         <Textarea
                           id="products_services"
                           value={businessData.products_services}
@@ -989,7 +1168,7 @@ export default function WelcomeOnboarding({ onComplete }) {
                       </div>
 
                       <div className={`space-y-2 ${isHebrew ? 'text-right' : ''}`}>
-                        <Label htmlFor="target_market">{t('business.targetMarket')} *</Label>
+                        <Label htmlFor="target_market">{t('business.targetMarket')}</Label>
                         <Textarea
                           id="target_market"
                           value={businessData.target_market}
@@ -1005,13 +1184,19 @@ export default function WelcomeOnboarding({ onComplete }) {
                       </div>
 
                       <div className={`space-y-3 ${isHebrew ? 'text-right' : ''}`}>
-                        <Label>{t('business.competitors')} *</Label>
+                        <Label>{t('business.competitors')}</Label>
                         <div className={`flex flex-col gap-3 sm:flex-row ${isHebrew ? 'sm:flex-row-reverse' : ''}`}>
                           <Input
                             value={newCompetitor}
                             onChange={(e) => {
                               setNewCompetitor(e.target.value);
                               if (fieldErrors.competitors) clearFieldError('competitors');
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addCompetitor();
+                              }
                             }}
                             placeholder={t('placeholder.addCompetitor')}
                             className={`${isHebrew ? 'text-right' : ''} ${fieldErrors.competitors ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
@@ -1140,6 +1325,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
                   {personaPage === 0 && (
                     <>
+    
                       <div className="grid gap-6 md:grid-cols-2">
                         <div className={isRTL ? 'text-right' : ''}>
                           <Label htmlFor="persona_name">{t('common.name')} *</Label>
@@ -1189,7 +1375,7 @@ export default function WelcomeOnboarding({ onComplete }) {
                         <StyledErrorMessage message={fieldErrors.personaJobTitle} />
                       </div>
 
-                      {/* AI Generation Button */}
+
                       <div className={`flex ${isRTL ? 'justify-start' : 'justify-center'} mt-6`}>
                         <Button
                           type="button"
@@ -1211,6 +1397,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
                   {personaPage === 1 && (
                     <>
+       
                       <div className={isRTL ? 'text-right' : ''}>
                         <Label htmlFor="persona_goals">{t('personas.goals')} *</Label>
                         <Textarea
@@ -1260,6 +1447,7 @@ export default function WelcomeOnboarding({ onComplete }) {
 
                   {personaPage === 2 && (
                     <>
+             
                       <div className={isRTL ? 'text-right' : ''}>
                         <Label htmlFor="persona_motivations">{t('welcome.persona.motivations')} *</Label>
                         <Textarea
@@ -1364,7 +1552,7 @@ export default function WelcomeOnboarding({ onComplete }) {
                 <CardContent className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-h-[calc(100vh-200px)]">
                   {generatedPersona && (
                     <div className="space-y-6">
-                      {/* Persona Header */}
+
                       <div className="text-center">
                         <div className="w-20 h-20 rounded-full bg-gradient-to-r from-sky-100 to-blue-200 flex items-center justify-center mx-auto mb-4">
                           <Users className="w-10 h-10 text-sky-600" />
@@ -1373,11 +1561,15 @@ export default function WelcomeOnboarding({ onComplete }) {
                           {t('welcome.meetPersona.title').replace('{name}', generatedPersona.name)}
                         </h3>
                         <p className="text-slate-600">
-                          {t('welcome.meetPersona.subtitle')}
+                          {t(
+                            generatedPersona?.is_ai_generated
+                              ? 'welcome.meetPersona.subtitle'
+                              : 'welcome.meetPersona.manualSubtitle'
+                          )}
                         </p>
                       </div>
 
-                      {/* Persona Details */}
+
                       <div className="grid gap-6 md:grid-cols-2">
                         <div className={`space-y-4 ${isRTL ? 'text-right' : ''}`}>
                           <div>

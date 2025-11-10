@@ -50,7 +50,20 @@ export default function CreatePersonaModal({
 
   useEffect(() => {
     if (editingPersona) {
-      setFormData(editingPersona);
+      // Normalize field names - handle both snake_case and camelCase
+      setFormData({
+        name: editingPersona.name || "",
+        age: editingPersona.age || "",
+        job_title: editingPersona.job_title || editingPersona.jobTitle || "",
+        lifestyle: editingPersona.lifestyle || "",
+        goals: editingPersona.goals || "",
+        pain_points: editingPersona.pain_points || editingPersona.painPoints || "",
+        motivations: editingPersona.motivations || "",
+        purchasing_habits: editingPersona.purchasing_habits || editingPersona.purchasingHabits || "",
+        backstory: editingPersona.backstory || "",
+        avatar_url: editingPersona.avatar_url || "",
+        is_ai_generated: editingPersona.is_ai_generated || editingPersona.isAiGenerated || false
+      });
     } else {
       setFormData({
         name: "",
@@ -123,7 +136,7 @@ export default function CreatePersonaModal({
       onPersonaCreated();
     } catch (error) {
       console.error("Error saving persona:", error);
-      alert(isHebrew ? 'שגיאה בשמירת האווטאר. אנא ודא שכל השדות הנדרשים מלאים ונסה שוב.' : 'Error saving avatar. Please ensure all required fields are filled and try again.');
+      alert(t('errors.personaSaveFailed'));
     }
     
     setIsSaving(false);

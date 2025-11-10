@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Read(//var/folders/q2/zkbc8wb91qj_2rsmzt_cvl8c0000gn/T/TemporaryItems/NSIRD_screencaptureui_f3rZQp/**)",
-      "Read(//var/folders/q2/zkbc8wb91qj_2rsmzt_cvl8c0000gn/T/TemporaryItems/NSIRD_screencaptureui_fKFk4g/**)",
-      "Read(//Users/admin/Desktop/**)"
+      "Bash(./node_modules/.bin/vite)",
+      "Bash(npx vite build)",
+      "Bash(node node_modules/vite/bin/vite.js build:*)"
     ],
     "deny": [],
     "ask": []

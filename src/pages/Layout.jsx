@@ -621,7 +621,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
       
     } catch (error) {
       console.error("Error deleting business:", error);
-      alert(isHebrew ? "שגיאה במחיקת העסק" : "Error deleting business");
+      alert(t('errors.deleteBusinessFailed'));
     } finally {
       setDeleteBusinessModal({ isOpen: false, businessId: null, businessName: '' });
     }
@@ -689,7 +689,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           </SelectItem>
         ) : (
           <>
-            {/* Primary Business Option */}
+
             {businesses.find(b => b.isPrimary) && (
               <SelectItem key="primary" value="primary" className={`text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                 <span className={`font-semibold text-sky-700 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -698,7 +698,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
               </SelectItem>
             )}
             
-              {/* Secondary Businesses */}
+
               {businesses.filter(b => !b.isPrimary).map((entry, index) => (
                 <div key={entry.id} className="relative">
                   <SelectItem value={entry.id} className={`text-sm pr-8 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -721,7 +721,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           </>
         )}
         
-        {/* Create New Business Button */}
+
         <div className="border-t border-slate-200 p-1">
           <Button
             onClick={() => setIsCreateBusinessModalOpen(true)}
@@ -802,13 +802,13 @@ function LayoutContent({ children, currentPageName, businessId }) {
           50% { transform: translateY(-10px); }
         }
 
-        /* RTL Support - Hebrew keeps sidebar on right */
+
         [dir="rtl"] .sidebar {
           border-left: 1px solid rgba(255, 255, 255, 0.2);
           border-right: none;
         }
         
-        /* LTR Support - English has sidebar on left */
+
         [dir="ltr"] .sidebar {
           border-right: 1px solid rgba(255, 255, 255, 0.2);
           border-left: none;
@@ -896,7 +896,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           flex-direction: row-reverse;
         }
         
-        /* Force RTL for business switcher */
+
         [dir="rtl"] .business-switcher-trigger {
           justify-content: flex-end !important;
           text-align: right !important;
@@ -913,7 +913,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* Force RTL for menu items */
+
         [dir="rtl"] .sidebar-menu-item {
           text-align: right !important;
           direction: rtl !important;
@@ -935,7 +935,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* More specific selectors for menu items */
+
         [dir="rtl"] [data-sidebar="menu-item"] {
           text-align: right !important;
           direction: rtl !important;
@@ -957,7 +957,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* RTL (Hebrew) - Keep icons on the right side */
+
         [dir="rtl"] [data-sidebar="menu-item"] a {
           flex-direction: row-reverse !important;
         }
@@ -970,7 +970,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 1 !important;
         }
         
-        /* More specific selectors for RTL icon positioning */
+
         [dir="rtl"] .sidebar-menu-item a {
           flex-direction: row-reverse !important;
         }
@@ -983,7 +983,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 1 !important;
         }
         
-        /* LTR (English) - Icons on the left side */
+
         [dir="ltr"] [data-sidebar="menu-item"] a {
           flex-direction: row !important;
         }
@@ -996,7 +996,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
         
-        /* More specific selectors for LTR icon positioning */
+
         [dir="ltr"] .sidebar-menu-item a {
           flex-direction: row !important;
         }
@@ -1009,7 +1009,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
         
-        /* RTL (Hebrew) - Keep profile picture on the right side */
+
         [dir="rtl"] .sidebar-footer {
           text-align: right !important;
           direction: rtl !important;
@@ -1035,7 +1035,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           text-align: right !important;
         }
         
-        /* LTR (English) - Profile picture on the left side */
+
         [dir="ltr"] .sidebar-footer {
           text-align: left !important;
           direction: ltr !important;
@@ -1061,7 +1061,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           text-align: left !important;
         }
         
-        /* Force RTL for page header */
+
         [dir="rtl"] .page-header {
           text-align: right !important;
           direction: rtl !important;
@@ -1087,7 +1087,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* Force button to be on the left side */
+
         [dir="rtl"] .page-header .flex-row-reverse {
           flex-direction: row-reverse !important;
         }
@@ -1100,7 +1100,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
         
-        /* More specific selectors to override any conflicting styles */
+
         [dir="rtl"] .page-header div[class*="flex"] {
           flex-direction: row-reverse !important;
         }
@@ -1115,18 +1115,18 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
         
-        /* Target the specific button */
+
         [dir="rtl"] .page-header button {
           margin-left: 0 !important;
           margin-right: auto !important;
         }
         
-        /* Force the layout to be RTL */
+
         [dir="rtl"] .page-header * {
           direction: rtl !important;
         }
         
-        /* Force button to be at the far left */
+
         [dir="rtl"] .page-header .actions {
           position: absolute !important;
           left: 0 !important;
@@ -1140,12 +1140,12 @@ function LayoutContent({ children, currentPageName, businessId }) {
           margin-right: 0 !important;
         }
         
-        /* Make sure the header container has relative positioning */
+
         [dir="rtl"] .page-header > div {
           position: relative !important;
         }
         
-        /* Force RTL for card titles */
+
         [dir="rtl"] .card-title {
           text-align: right !important;
           direction: rtl !important;
@@ -1161,7 +1161,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* Force the blue bar to be on the right side in RTL */
+
         [dir="rtl"] .card-title .flex-row-reverse {
           flex-direction: row-reverse !important;
         }
@@ -1174,7 +1174,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
         
-        /* Persona Card RTL Support */
+
         [dir="rtl"] .persona-card h3 {
           text-align: right !important;
           direction: rtl !important;
@@ -1195,7 +1195,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           direction: rtl !important;
         }
         
-        /* Force persona card layout in RTL */
+
         [dir="rtl"] .persona-card .flex-row-reverse {
           flex-direction: row-reverse !important;
         }
@@ -1208,7 +1208,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           order: 2 !important;
         }
 
-        /* Hebrew Font Support */
+
         [lang="he"] {
           font-family: 'Segoe UI', Tahoma, Arial, 'Noto Sans Hebrew', sans-serif;
         }
@@ -1221,7 +1221,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           text-align: left;
         }
 
-        /* Safe area support for iOS */
+
         .safe-area-inset-bottom {
           padding-bottom: 1.25rem;
           padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
@@ -1232,19 +1232,19 @@ function LayoutContent({ children, currentPageName, businessId }) {
           padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Touch targets optimization */
+
         .touch-manipulation {
           touch-action: manipulation;
         }
 
-        /* Bottom navigation mobile optimizations */
+
         @media (max-width: 1024px) {
           .bottom-nav-padding {
             padding-bottom: calc(88px + env(safe-area-inset-bottom));
           }
         }
 
-        /* Improved mobile spacing */
+
         @media (max-width: 640px) {
           .mobile-padding {
             padding-left: 1rem;
@@ -1252,7 +1252,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
           }
         }
 
-        /* Better mobile grid layouts */
+
         @media (max-width: 768px) {
           .mobile-grid {
             grid-template-columns: 1fr;
@@ -1295,7 +1295,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
                   <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse justify-end' : 'justify-start'}`}>
                     <Sparkles className="w-3 h-3 text-sky-500" />
                     <p className={`text-xs text-sky-600 font-medium ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {isHebrew ? 'פלטפורמת AI' : 'AI Platform'}
+                      {isHebrew ? 'מדידת מותג במנועי AI' : 'Brand measurement in AI engines'}
                     </p>
                   </div>
                 </div>
@@ -1426,12 +1426,12 @@ function LayoutContent({ children, currentPageName, businessId }) {
           <main className={`flex-1 flex flex-col min-h-screen ${isRTL ? 'order-2' : 'order-2'}`}>
             <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-4 py-4 xl:hidden sticky top-0 z-50">
               <div className={`flex items-center justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                {/* Business Switcher */}
+
                 <div className={`flex-1 min-w-0 ${isRTL ? 'order-2' : 'order-1'}`}>
                   <BusinessSwitcher triggerClassName="w-full" contentClassName="min-w-[180px]" />
                 </div>
                 
-                {/* Profile Button */}
+
                 {user && (
                   <button
                     type="button"
@@ -1446,7 +1446,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
                 )}
               </div>
               
-              {/* Page Title - Only show if there's space */}
+
               <div className="mt-3">
                 <h1 className={`text-lg font-semibold bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent truncate ${isRTL ? 'text-right' : 'text-left'}`}>
                   {mobileHeaderTitle}
@@ -1476,7 +1476,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
         onBusinessCreated={handleBusinessCreated}
       />
 
-      {/* Delete Business Confirmation Dialog */}
+
       {deleteBusinessModal.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">

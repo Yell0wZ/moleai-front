@@ -32,6 +32,9 @@ export default function TrendChart({ prompts, businessId }) {
       case 'lastMonth':
         const lastMonth = subMonths(today, 1);
         return { start: startOfMonth(lastMonth), end: endOfMonth(lastMonth) };
+      case 'lifetime':
+        // For lifetime, return null to indicate no date filtering
+        return null;
       case 'custom':
         if (customDateRange.start && customDateRange.end) {
           return {
@@ -53,19 +56,25 @@ export default function TrendChart({ prompts, businessId }) {
     const dailyMentions = {};
     const dateRange = getDateRange();
 
-    // Filter prompts within the selected date range
-    const filteredPrompts = prompts.filter(prompt => {
-      let promptDate;
-      if (prompt.created_date instanceof Date) {
-        promptDate = prompt.created_date;
-      } else if (typeof prompt.created_date === 'string') {
-        promptDate = parseISO(prompt.created_date);
-      } else {
-        promptDate = new Date();
-      }
+    // For lifetime, use all prompts without date filtering
+    let filteredPrompts;
+    if (selectedPeriod === 'lifetime') {
+      filteredPrompts = prompts;
+    } else {
+      // Filter prompts within the selected date range
+      filteredPrompts = prompts.filter(prompt => {
+        let promptDate;
+        if (prompt.created_date instanceof Date) {
+          promptDate = prompt.created_date;
+        } else if (typeof prompt.created_date === 'string') {
+          promptDate = parseISO(prompt.created_date);
+        } else {
+          promptDate = new Date();
+        }
 
-      return promptDate >= dateRange.start && promptDate <= dateRange.end;
-    });
+        return promptDate >= dateRange.start && promptDate <= dateRange.end;
+      });
+    }
 
     filteredPrompts.forEach(prompt => {
       let date;
@@ -98,13 +107,41 @@ export default function TrendChart({ prompts, businessId }) {
       dailyMentions[date] += mentions;
     });
 
-
-    // Create array of days in the selected range
-    const days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
+    // For lifetime, use all unique dates from prompts instead of a date range
+    let days;
+    if (selectedPeriod === 'lifetime') {
+      // Get all unique dates from prompts
+      const uniqueDates = new Set(Object.keys(dailyMentions));
+      days = Array.from(uniqueDates)
+        .map(dateStr => parseISO(dateStr))
+        .filter(date => !isNaN(date.getTime()))
+        .sort((a, b) => a.getTime() - b.getTime());
+      
+      // If no dates found, return empty array
+      if (days.length === 0) return [];
+    } else {
+      // Create array of days in the selected range
+      days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
+    }
 
     const result = days.map(day => {
       const dateKey = format(day, 'yyyy-MM-dd');
-      const dateFormat = selectedPeriod.includes('30') || selectedPeriod.includes('month') ? 'MMM dd' : 'MMM dd';
+      // Adjust date format based on period - for lifetime use month format, for shorter periods use day format
+      let dateFormat = 'MMM dd';
+      if (selectedPeriod === 'lifetime') {
+        // For lifetime, adjust format based on date range
+        if (days.length > 365) {
+          dateFormat = 'MMM yyyy';
+        } else if (days.length > 60) {
+          dateFormat = 'MMM dd';
+        } else {
+          dateFormat = 'MMM dd';
+        }
+      } else if (selectedPeriod.includes('30') || selectedPeriod.includes('month')) {
+        dateFormat = 'MMM dd';
+      } else {
+        dateFormat = 'MMM dd';
+      }
       return {
         date: format(day, dateFormat),
         mentions: dailyMentions[dateKey] || 0,
@@ -125,6 +162,7 @@ export default function TrendChart({ prompts, businessId }) {
     { value: '30days', label: t('competitors.last30Days') },
     { value: 'month', label: t('competitors.thisMonth') },
     { value: 'lastMonth', label: t('competitors.lastMonth') },
+    { value: 'lifetime', label: t('competitors.lifeTime') },
     { value: 'custom', label: t('competitors.customRange') }
   ];
 
@@ -146,7 +184,7 @@ export default function TrendChart({ prompts, businessId }) {
             )}
           </CardTitle>
 
-          {/* Date Range Controls */}
+
           <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {periodOptions.map(option => (
               <Button
@@ -165,7 +203,7 @@ export default function TrendChart({ prompts, businessId }) {
             ))}
           </div>
 
-          {/* Custom Date Range Inputs */}
+
           {selectedPeriod === 'custom' && (
             <div className={`flex gap-2 items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Calendar className="w-4 h-4 text-gray-500" />

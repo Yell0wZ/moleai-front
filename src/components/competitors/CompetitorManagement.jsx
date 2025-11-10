@@ -96,7 +96,7 @@ export default function CompetitorManagement({ businessProfile, competitors: ini
       
     } catch (error) {
       console.error("Error saving competitors:", error);
-      alert(isHebrew ? "שגיאה בשמירת המתחרים" : "Error saving competitors");
+      alert(t('errors.saveCompetitorsFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -126,7 +126,12 @@ export default function CompetitorManagement({ businessProfile, competitors: ini
             onChange={(e) => setNewCompetitor(e.target.value)}
             placeholder={t('competitors.addCompetitor')}
             className={`flex-1 ${isRTL ? 'text-right' : ''}`}
-            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCompetitor())}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addCompetitor();
+              }
+            }}
             dir="auto"
           />
           <Button
@@ -166,7 +171,7 @@ export default function CompetitorManagement({ businessProfile, competitors: ini
           </div>
         )}
 
-        {/* Save Button */}
+
         {hasUnsavedChanges && (
           <div className={`flex justify-end pt-4 border-t border-gray-200 ${isRTL ? 'justify-start' : ''}`}>
             <Button

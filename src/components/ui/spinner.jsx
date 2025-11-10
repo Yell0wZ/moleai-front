@@ -24,7 +24,7 @@ const Spinner = ({ size = "default", variant = "primary", className, ...props })
       )}
       {...props}
     >
-      {/* Modern dot spinner animation */}
+
       <div className={cn("relative", sizeClasses[size])}>
         {[...Array(3)].map((_, i) => (
           <div
@@ -96,7 +96,7 @@ const PulseSpinner = ({ size = "default", variant = "primary", className, ...pro
       )}
       {...props}
     >
-      {/* Outer pulse ring */}
+
       <div
         className={cn(
           "absolute rounded-full border-2 animate-ping",
@@ -104,7 +104,7 @@ const PulseSpinner = ({ size = "default", variant = "primary", className, ...pro
           variantClasses[variant]
         )}
       />
-      {/* Inner solid dot */}
+
       <div
         className={cn(
           "rounded-full",

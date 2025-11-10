@@ -256,7 +256,7 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Competitor Management */}
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -272,9 +272,9 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
           />
         </motion.div>
 
-        {/* Charts */}
+
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          {/* Mention Comparison Bar Chart */}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -297,7 +297,7 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
                     )}
                   </CardTitle>
 
-                  {/* Date Range Controls */}
+
                   <div className={`flex flex-wrap gap-1 sm:gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     {periodOptions.map(option => (
                       <Button
@@ -316,7 +316,7 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
                     ))}
                   </div>
 
-                  {/* Custom Date Range Inputs */}
+
                   {selectedPeriod === 'custom' && (
                     <div className={`flex flex-col sm:flex-row gap-2 items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
@@ -341,16 +341,18 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
               </CardHeader>
               <CardContent>
                 {competitorData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={competitorData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart data={competitorData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                       <XAxis 
                         dataKey="name" 
                         stroke="#6B7280"
-                        tick={{ fontSize: 12 }}
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
+                        tick={{ fontSize: 12, fill: '#374151' }}
+                        angle={0}
+                        textAnchor="middle"
+                        height={60}
+                        interval={0}
+                        tickMargin={10}
                       />
                       <YAxis stroke="#6B7280" />
                       <Tooltip 
@@ -385,7 +387,7 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
             </Card>
           </motion.div>
 
-          {/* Mention Share Pie Chart */}
+
           {pieData.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -401,16 +403,23 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-6">
-                    <ResponsiveContainer width="100%" height={250}>
+                    <ResponsiveContainer width="100%" height={350}>
                       <PieChart>
                         <Pie
                           data={pieData}
                           cx="50%"
                           cy="50%"
-                          outerRadius={80}
+                          outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({name, percentage}) => `${percentage}%`}
+                          label={({percentage, value}) => {
+                            // Only show label if value is greater than 0 and percentage is meaningful
+                            if (value > 0 && parseFloat(percentage) >= 1) {
+                              return `${percentage}%`;
+                            }
+                            return '';
+                          }}
+                          labelLine={{ stroke: '#666', strokeWidth: 1 }}
                         >
                           {pieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -423,6 +432,10 @@ export default function CompetitorPage({ businessId, refreshBusinessData }) {
                             borderRadius: '8px',
                             boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
                           }}
+                          formatter={(value, name, props) => [
+                            `${props.payload.percentage}% (${value} mentions)`,
+                            props.payload.name
+                          ]}
                         />
                       </PieChart>
                     </ResponsiveContainer>

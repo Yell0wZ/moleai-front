@@ -168,7 +168,7 @@ export default function CreateBusinessModal({
       };
 
       // Call Firebase Functions endpoint
-      const response = await fetch('https://createbuisness-thg3z73fma-uc.a.run.app/secondary-business', {
+      const response = await fetch('https://createbuisness-p54weh4vrq-uc.a.run.app/secondary-business', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -313,7 +313,7 @@ export default function CreateBusinessModal({
               </div>
             </div>
 
-            {/* Products/Services */}
+
             <div className={isRTL ? 'text-right' : ''}>
               <Label className="text-sm font-medium text-gray-700">
                 {t('business.productsServices') || "Products/Services"} *
@@ -363,7 +363,7 @@ export default function CreateBusinessModal({
               </div>
             </div>
 
-            {/* Competitors */}
+
             <div className={isRTL ? 'text-right' : ''}>
               <Label className="text-sm font-medium text-gray-700">
                 {t('business.competitors') || "Competitors"} *

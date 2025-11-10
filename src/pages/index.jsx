@@ -87,10 +87,10 @@ function PagesContent() {
     return (
         <Layout currentPageName={currentPage} businessId={businessId}>
             <Routes>            
-                {/* Root redirect - redirect to businessprofile */}
+
                 <Route path="/" element={<Navigate to="/businessprofile" replace />} />
                 
-                {/* Primary business routes */}
+
                 <Route path="/businessprofile" element={<BusinessProfile businessId={businessId} />} />
                 <Route path="/analytics" element={<Analytics businessId={businessId} />} />
                 <Route path="/avatar" element={<Persona businessId={businessId} />} />
@@ -98,14 +98,14 @@ function PagesContent() {
                 <Route path="/competitor" element={<Competitor businessId={businessId} />} />
                 <Route path="/profile" element={<Profile businessId={businessId} />} />
                 
-                {/* Old routes for backward compatibility */}
+
                 <Route path="/BusinessProfile" element={<Navigate to="/businessprofile" replace />} />
                 <Route path="/Analytics" element={<Navigate to="/analytics" replace />} />
                 <Route path="/Prompt" element={<Navigate to="/prompt" replace />} />
                 <Route path="/Competitor" element={<Navigate to="/competitor" replace />} />
                 <Route path="/Profile" element={<Navigate to="/profile" replace />} />
                 
-                {/* New routes with businessId */}
+
                 <Route path="/:businessId/businessprofile" element={<BusinessProfile businessId={businessId} />} />
                 <Route path="/:businessId/analytics" element={<Analytics businessId={businessId} />} />
                 <Route path="/:businessId/avatar" element={<Persona businessId={businessId} />} />

@@ -243,8 +243,18 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
     );
   }
 
+  const containerClasses = [
+    "p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-8",
+    isRTL ? "lg:pr-40 xl:pr-56" : "business-profile-desktop-shift",
+    "laptop-spacing",
+    "laptop-lg-spacing",
+    "desktop-spacing",
+    "desktop-lg-spacing",
+    isRTL ? "text-right" : ""
+  ].filter(Boolean).join(" ");
+
   return (
-    <div className={`p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-8 business-profile-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing ${isRTL ? 'text-right' : ''}`}>
+    <div className={containerClasses}>
       <PageHeader
         icon={<Building2 className="w-8 h-8" />}
         title={t('business.title')}
@@ -268,7 +278,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
         transition={{ delay: 0.1 }}
         className="space-y-6"
       >
-        {/* Basic Information Section */}
+
         <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-sky-50 to-blue-50 border-b border-sky-100">
             <CardTitle 
@@ -303,7 +313,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                 </Button>
               </div>
 
-              {/* Basic Information Grid */}
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <motion.div 
                   className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
@@ -360,7 +370,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
 
 
 
-              {/* Description Section */}
+
               <motion.div 
                 className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
                 initial={{ opacity: 0, y: 20 }}
@@ -388,7 +398,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                 )}
               </motion.div>
 
-              {/* Products & Services and Target Market Grid */}
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <motion.div 
                   className={`space-y-3 ${isRTL ? 'text-right' : ''}`}
@@ -445,7 +455,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                 </motion.div>
               </div>
 
-              {/* Competitors Section */}
+
               <motion.div 
                 className="space-y-4"
                 initial={{ opacity: 0, y: 20 }}
@@ -511,7 +521,7 @@ export default function BusinessProfilePage({ businessId, refreshBusinessData })
                 )}
               </motion.div>
 
-              {/* Save Button */}
+
               <motion.div 
                 className="pt-8"
                 initial={{ opacity: 0, y: 20 }}

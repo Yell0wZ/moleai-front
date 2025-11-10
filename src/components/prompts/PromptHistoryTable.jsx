@@ -25,7 +25,7 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
 
   return (
     <div className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Mobile Card View */}
+
       <div className="block lg:hidden space-y-4">
         {prompts.map((prompt) => (
           <div key={prompt.id} className="bg-white/90 backdrop-blur-sm border border-white/20 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group">
@@ -79,7 +79,7 @@ export default function PromptHistoryTable({ prompts, onViewResponses }) {
         ))}
       </div>
 
-      {/* Desktop Table View */}
+
       <div className="hidden lg:block overflow-x-auto rounded-2xl border border-white/20 shadow-lg bg-white/90 backdrop-blur-sm">
         <Table className="min-w-full">
           <TableHeader>

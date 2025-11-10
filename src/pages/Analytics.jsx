@@ -142,7 +142,7 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
         showOnMobile={false}
       />
 
-      {/* Stats Overview */}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -156,11 +156,11 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 responsive-grid-3">
-        {/* Left Column - Sentiment Analysis and Key Themes */}
+
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          {/* Sentiment Analysis and Key Themes Row */}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 responsive-grid-2">
-            {/* Sentiment Analysis */}
+
             <motion.div
               initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -173,7 +173,7 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
               />
             </motion.div>
 
-            {/* Key Themes */}
+
             <motion.div
               initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -183,7 +183,7 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
             </motion.div>
           </div>
 
-          {/* Trend Chart - Full width below */}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -193,7 +193,7 @@ export default function AnalyticsPage({ businessId, refreshBusinessData }) {
           </motion.div>
         </div>
 
-        {/* Right Column - Brand Analysis */}
+
         <div className="space-y-4 sm:space-y-6">
             <BrandAnalysis 
               prompts={prompts} 

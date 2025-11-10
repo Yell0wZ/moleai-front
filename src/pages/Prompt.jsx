@@ -58,18 +58,39 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
       
       setPrompts(promptData);
       setPersonas(personaData);
+      setIsLoading(false);
+      return { promptData, personaData };
     } catch (error) {
       console.error("Error loading data:", error);
+      setIsLoading(false);
+      return { promptData: [], personaData: [] };
     }
-    setIsLoading(false);
   };
 
-  const handlePromptSent = () => {
-    loadData();
+  const handlePromptSent = async (newPrompt) => {
     setShowSendModal(false);
     // Trigger business data refresh
     if (refreshBusinessData) {
       refreshBusinessData();
+    }
+    
+    // Reload data to get the updated prompt with all its data
+    const { promptData } = await loadData();
+    
+    // Find the newly created prompt in the list (it should be the first one as we sort by -created_date)
+    // If newPrompt was passed and has an id, try to match it, otherwise use the first prompt
+    let promptToShow = null;
+    if (newPrompt && newPrompt.id && promptData.length > 0) {
+      promptToShow = promptData.find(p => p.id === newPrompt.id) || promptData[0];
+    } else if (promptData.length > 0) {
+      // If no specific prompt passed, use the first one (most recent)
+      promptToShow = promptData[0];
+    }
+    
+    // Open the response modal automatically with the new prompt
+    if (promptToShow) {
+      setSelectedPrompt(promptToShow);
+      setShowResponseModal(true);
     }
   };
 
@@ -143,16 +164,16 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
         showOnMobile={false}
       />
 
-      {/* Mobile-only Send Button */}
+
       <div className="block lg:hidden">
         <Button
           onClick={() => setShowSendModal(true)}
           className={`relative bg-gradient-to-r from-sky-500 via-blue-500 to-blue-600 hover:from-sky-600 hover:via-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-500 text-lg w-full h-16 overflow-hidden group ${isRTL ? 'flex-row-reverse' : ''}`}
         >
-          {/* Continuous lightning animation */}
+
           <div className="absolute inset-0 -top-1 -bottom-1 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 animate-lightning"></div>
           
-          {/* Hover lightning animation */}
+
           <div className="absolute inset-0 -top-1 -bottom-1 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
           
           <Send className={`w-6 h-6 relative z-10 ${isRTL ? 'ml-3' : 'mr-3'}`} />
@@ -174,7 +195,7 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
         </Button>
       </div>
 
-      {/* Stats Cards */}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -295,7 +316,7 @@ export default function PromptPage({ businessId, refreshBusinessData }) {
 
       </motion.div>
 
-      {/* Prompts Table */}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

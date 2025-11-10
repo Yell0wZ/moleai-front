@@ -67,7 +67,7 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
   const keywords = latestBrandAnalysis.keywords || [];
   const sentiment = latestBrandAnalysis.sentiment || 'Neutral';
 
-  // Extract counts data from the same prompt
+  // Extract counts data from all prompts
   const countsData = [];
   
   prompts.forEach((prompt, index) => {
@@ -85,8 +85,18 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
     }
   });
 
-  // Use real counts data only
-  const latestCounts = countsData[0] || {};
+  // Calculate total counts from all prompts (not just the latest)
+  const totalCounts = countsData.reduce((acc, counts) => {
+    return {
+      businessNameMentions: (acc.businessNameMentions || 0) + (counts.businessNameMentions || 0),
+      competitorsMentions: (acc.competitorsMentions || 0) + (counts.competitorsMentions || 0),
+      industryMentions: (acc.industryMentions || 0) + (counts.industryMentions || 0),
+      productsServicesMentions: (acc.productsServicesMentions || 0) + (counts.productsServicesMentions || 0),
+    };
+  }, {});
+
+  // Use total counts from all prompts
+  const displayCounts = Object.keys(totalCounts).length > 0 ? totalCounts : {};
 
   // Get sentiment color and icon
   const getSentimentConfig = (sentiment) => {
@@ -128,7 +138,7 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 flex-1 flex flex-col">
-          {/* Sentiment Overview */}
+
           <div className={`p-4 rounded-lg border ${sentimentConfig.bgColor} ${sentimentConfig.color} relative`}>
             <div className="flex items-center gap-3">
               {sentimentConfig.icon}
@@ -141,7 +151,7 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
                 </p>
               </div>
             </div>
-            {/* Sentiment Badge in top corner */}
+
             <div className={`absolute top-3 ${isHebrew ? 'left-3' : 'right-3'}`}>
               <Badge 
                 variant="outline" 
@@ -153,8 +163,8 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
           </div>
 
 
-          {/* Counts Section - Only show if we have real data */}
-          {Object.keys(latestCounts).length > 0 && (
+
+          {Object.keys(displayCounts).length > 0 && (
             <div>
               <h3 className="font-medium mb-3 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-green-600" />
@@ -162,26 +172,26 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
               </h3>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1 whitespace-nowrap">
-                  <span className="font-bold">{latestCounts.businessNameMentions || 0}</span>
+                  <span className="font-bold">{displayCounts.businessNameMentions || 0}</span>
                   <span>{isHebrew ? "שם עסק" : "Business"}</span>
                 </Badge>
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 whitespace-nowrap">
-                  <span className="font-bold">{latestCounts.competitorsMentions || 0}</span>
+                  <span className="font-bold">{displayCounts.competitorsMentions || 0}</span>
                   <span>{isHebrew ? "מתחרים" : "Competitors"}</span>
                 </Badge>
                 <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 flex items-center gap-1 whitespace-nowrap">
-                  <span className="font-bold">{latestCounts.industryMentions || 0}</span>
+                  <span className="font-bold">{displayCounts.industryMentions || 0}</span>
                   <span>{isHebrew ? "תעשייה" : "Industry"}</span>
                 </Badge>
                 <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 flex items-center gap-1 whitespace-nowrap">
-                  <span className="font-bold">{latestCounts.productsServicesMentions || 0}</span>
+                  <span className="font-bold">{displayCounts.productsServicesMentions || 0}</span>
                   <span>{isHebrew ? "מוצרים" : "Products"}</span>
                 </Badge>
               </div>
             </div>
           )}
 
-          {/* Keywords Section */}
+
           {keywords.length > 0 && (
             <div>
               <h3 className="font-medium mb-3 flex items-center gap-2">
@@ -209,7 +219,7 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
           )}
 
 
-          {/* Action Recommendations */}
+
           <div>
             <h3 className="font-medium mb-3 flex items-center gap-2">
               <Brain className="w-4 h-4 text-purple-600" />
@@ -260,7 +270,7 @@ export default function BrandAnalysis({ prompts, businessProfile, businessId }) 
             </div>
           </div>
 
-          {/* Analysis Summary */}
+
           <div className="-mb-[-10px] border-t border-gray-100">
             <h3 className="font-medium mb-2">
               {isHebrew ? "סיכום הניתוח" : "Analysis Summary"}

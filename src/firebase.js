@@ -7,14 +7,14 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDJ3Vc4XIYZRSmrv1xQWSeilUBWevW8fqw",
-  authDomain: "moleai-testing.firebaseapp.com",
-  projectId: "moleai-testing",
-  storageBucket: "moleai-testing.firebasestorage.app",
-  messagingSenderId: "1000623741758",
-  appId: "1:1000623741758:web:fcf435d06a664faee72a6f"
+  apiKey: "AIzaSyAWIfRD01PfVZlj0HF-2fbvjjlOS7sCdU8",
+  authDomain: "mole-ai.com",
+  projectId: "moleai-471412",
+  storageBucket: "moleai-471412.firebasestorage.app",
+  messagingSenderId: "985936770132",
+  appId: "1:985936770132:web:c7dfd0c694f614550ea9c1",
+  measurementId: "G-QRS5KWZTRK"
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 

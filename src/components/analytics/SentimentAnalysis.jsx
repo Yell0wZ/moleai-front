@@ -9,81 +9,84 @@ export default function SentimentAnalysis({ prompts, businessProfile, businessId
   const getSentimentData = () => {
     const sentiments = { positive: 0, neutral: 0, negative: 0 };
     
-    // Debug: Log prompts structure
-    if (prompts.length > 0) {
-      
-      // Check if brandAnalysis exists in different locations
-    }
-    
+    // Only count sentiment for prompts that have business mentions
     prompts.forEach((prompt, index) => {
+      // Check if this prompt has business mentions
+      const businessMentions = prompt.businessNameMentions || 
+                               prompt.counts?.businessNameMentions || 
+                               prompt[1]?.counts?.businessNameMentions || 
+                               0;
+      
+      // Only process sentiment if there are actual business mentions
+      if (businessMentions === 0) {
+        return; // Skip prompts without business mentions
+      }
       
       // Check for the correct structure: prompts[1].brandAnalysis.sentiment
       if (prompt[1]?.brandAnalysis?.sentiment) {
         const sentiment = prompt[1].brandAnalysis.sentiment.toLowerCase();
         if (sentiment === 'positive') {
-          sentiments.positive++;
+          sentiments.positive += businessMentions;
         } else if (sentiment === 'negative') {
-          sentiments.negative++;
+          sentiments.negative += businessMentions;
         } else {
-          sentiments.neutral++;
+          sentiments.neutral += businessMentions;
         }
       }
       // Check if brandAnalysis is directly on the prompt
       else if (prompt.brandAnalysis?.sentiment) {
         const sentiment = prompt.brandAnalysis.sentiment.toLowerCase();
         if (sentiment === 'positive') {
-          sentiments.positive++;
+          sentiments.positive += businessMentions;
         } else if (sentiment === 'negative') {
-          sentiments.negative++;
+          sentiments.negative += businessMentions;
         } else {
-          sentiments.neutral++;
+          sentiments.neutral += businessMentions;
         }
       }
       // Fallback to prompts[0] structure
       else if (prompt[0]?.brandAnalysis?.sentiment) {
         const sentiment = prompt[0].brandAnalysis.sentiment.toLowerCase();
         if (sentiment === 'positive') {
-          sentiments.positive++;
+          sentiments.positive += businessMentions;
         } else if (sentiment === 'negative') {
-          sentiments.negative++;
+          sentiments.negative += businessMentions;
         } else {
-          sentiments.neutral++;
+          sentiments.neutral += businessMentions;
         }
       }
       // Fallback to old structure if exists
       else if (prompt.responses?.brandAnalysis?.sentiment) {
         const sentiment = prompt.responses.brandAnalysis.sentiment.toLowerCase();
         if (sentiment === 'positive') {
-          sentiments.positive++;
+          sentiments.positive += businessMentions;
         } else if (sentiment === 'negative') {
-          sentiments.negative++;
+          sentiments.negative += businessMentions;
         } else {
-          sentiments.neutral++;
+          sentiments.neutral += businessMentions;
         }
       }
       else if (prompt.sentiment_analysis?.business_sentiment) {
-        sentiments[prompt.sentiment_analysis.business_sentiment]++;
+        sentiments[prompt.sentiment_analysis.business_sentiment] += businessMentions;
       }
       // Fallback to sentiment_score if exists
       else if (prompt.sentiment_score !== undefined) {
         if (prompt.sentiment_score > 0.6) {
-          sentiments.positive++;
+          sentiments.positive += businessMentions;
         } else if (prompt.sentiment_score < 0.4) {
-          sentiments.negative++;
+          sentiments.negative += businessMentions;
         } else {
-          sentiments.neutral++;
+          sentiments.neutral += businessMentions;
         }
       }
     });
 
     const total = Object.values(sentiments).reduce((sum, count) => sum + count, 0);
     
-    // Debug: Log sentiment counts
-    
     return {
-      positive: { count: sentiments.positive, percentage: total > 0 ? (sentiments.positive / total * 100).toFixed(1) : 0 },
-      neutral: { count: sentiments.neutral, percentage: total > 0 ? (sentiments.neutral / total * 100).toFixed(1) : 0 },
-      negative: { count: sentiments.negative, percentage: total > 0 ? (sentiments.negative / total * 100).toFixed(1) : 0 }
+      positive: { count: sentiments.positive, percentage: total > 0 ? (sentiments.positive / total * 100).toFixed(1) : '0.0' },
+      neutral: { count: sentiments.neutral, percentage: total > 0 ? (sentiments.neutral / total * 100).toFixed(1) : '0.0' },
+      negative: { count: sentiments.negative, percentage: total > 0 ? (sentiments.negative / total * 100).toFixed(1) : '0.0' }
     };
   };
 
@@ -185,8 +188,15 @@ export default function SentimentAnalysis({ prompts, businessProfile, businessId
                 <div className="text-2xl font-bold text-gray-900">{item.data.percentage}%</div>
                 <div className={`w-16 h-2 bg-gray-200 rounded-full mt-1 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
                   <div 
-                    className={`h-full rounded-full ${item.bgColor.replace('bg-', 'bg-').replace('-100', '-500')}`}
-                    style={{ width: `${item.data.percentage}%` }}
+                    className={`h-full rounded-full ${
+                      item.type === 'positive' ? 'bg-green-500' :
+                      item.type === 'neutral' ? 'bg-yellow-500' :
+                      'bg-red-500'
+                    }`}
+                    style={{ 
+                      width: `${Math.max(parseFloat(item.data.percentage) || 0, 0)}%`,
+                      minWidth: parseFloat(item.data.percentage) > 0 ? '4px' : '0px'
+                    }}
                   ></div>
                 </div>
               </div>

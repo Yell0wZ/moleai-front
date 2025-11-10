@@ -24,7 +24,7 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [editingPersona, setEditingPersona] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, persona: null });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, persona: null, isDeleting: false });
   const navigate = useNavigate();
 
   // Get current business context
@@ -81,21 +81,28 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
 
   const handlePersonaDelete = (personaId) => {
     const persona = personas.find(p => p.id === personaId);
-    setDeleteModal({ isOpen: true, persona });
+    setDeleteModal({ isOpen: true, persona, isDeleting: false });
   };
 
   const confirmDelete = async () => {
+    if (deleteModal.isDeleting) return; // Prevent double clicks
+    
+    setDeleteModal(prev => ({ ...prev, isDeleting: true }));
     try {
       await Persona.delete(deleteModal.persona.id, currentBusinessId);
+      // Close modal immediately after successful deletion
+      setDeleteModal({ isOpen: false, persona: null, isDeleting: false });
+      // Refresh data
       loadData();
-      setDeleteModal({ isOpen: false, persona: null });
     } catch (error) {
       console.error("Error deleting persona:", error);
+      setDeleteModal(prev => ({ ...prev, isDeleting: false }));
     }
   };
 
   const cancelDelete = () => {
-    setDeleteModal({ isOpen: false, persona: null });
+    if (deleteModal.isDeleting) return; // Prevent closing while deleting
+    setDeleteModal({ isOpen: false, persona: null, isDeleting: false });
   };
 
   if (isLoading) {
@@ -176,7 +183,7 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
         showOnMobile={false}
       />
 
-      {/* Mobile buttons - shown only on mobile */}
+
       <div className="block md:hidden">
         {headerActions}
       </div>
@@ -254,13 +261,13 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
         businessId={currentBusinessId}
       />
 
-      {/* Delete Persona Confirmation Dialog */}
+
       {deleteModal.isOpen && deleteModal.persona && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {isHebrew ? "מחיקת פרסונה" : "Delete Persona"}
+                {isHebrew ? "מחיקת אווטאר" : "Delete Avatar"}
               </h3>
             </div>
             
@@ -268,13 +275,13 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
               {isHebrew 
                 ? (
                   <>
-                    האם אתה בטוח שברצונך למחוק את הפרסונה "{deleteModal.persona.name}"?{" "}
+                    האם אתה בטוח שברצונך למחוק את האווטאר "{deleteModal.persona.name}"?{" "}
                     <span className="font-semibold text-red-600">פעולה זו לא ניתנת לביטול.</span>
                   </>
                 )
                 : (
                   <>
-                    Are you sure you want to delete the persona "{deleteModal.persona.name}"?<br></br>
+                    Are you sure you want to delete the avatar "{deleteModal.persona.name}"?<br></br>
                     <span className="font-semibold text-red-600">This action cannot be undone.</span>
                   </>
                 )
@@ -286,6 +293,7 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
                 onClick={cancelDelete}
                 variant="outline"
                 className="flex-1"
+                disabled={deleteModal.isDeleting}
               >
                 {isHebrew ? "ביטול" : "Cancel"}
               </Button>
@@ -293,8 +301,25 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
                 onClick={confirmDelete}
                 variant="destructive"
                 className="flex-1"
+                disabled={deleteModal.isDeleting}
               >
-                {isHebrew ? "מחק" : "Delete"}
+                {deleteModal.isDeleting ? (
+                  <span className="flex items-center gap-2">
+                    {isHebrew ? (
+                      <>
+                        <Lordicon size="sm" variant="white" />
+                        מוחק...
+                      </>
+                    ) : (
+                      <>
+                        <Lordicon size="sm" variant="white" />
+                        Deleting...
+                      </>
+                    )}
+                  </span>
+                ) : (
+                  isHebrew ? "מחק" : "Delete"
+                )}
               </Button>
             </div>
           </div>

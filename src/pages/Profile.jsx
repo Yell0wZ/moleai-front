@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { Building2, RefreshCcw, Sparkles, LogOut, Trash2, AlertTriangle, X } from "lucide-react";
+import { Building2, RefreshCcw, Sparkles, LogOut, AlertTriangle, X } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { db } from "@/firebase";
@@ -47,42 +47,9 @@ export default function ProfilePage({ businessId }) {
     businesses: [],
     usage: null,
     lastUpdated: null,
-    rawDatabaseData: null,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const downloadDatabaseJSON = () => {
-    console.log('Download button clicked!');
-    console.log('Raw database data:', state.rawDatabaseData);
-    console.log('State:', state);
-    
-    // Try to get fresh data from Firestore if not available
-    if (!state.rawDatabaseData) {
-      console.log('No raw data in state, trying to fetch fresh data...');
-      fetchProfileData(true);
-      setTimeout(() => {
-        if (state.rawDatabaseData) {
-          downloadDatabaseJSON();
-        } else {
-          alert(isHebrew ? 'אין נתוני דטה בייס זמינים' : 'No database data available');
-        }
-      }, 1000);
-      return;
-    }
-
-    const dataStr = JSON.stringify(state.rawDatabaseData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `database-data-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
 
   const fetchProfileData = useCallback(
     async (showFullLoading = false) => {
@@ -215,7 +182,6 @@ export default function ProfilePage({ businessId }) {
             console.log('Previous state:', prev);
             const newState = {
               ...prev,
-              rawDatabaseData: clientData
             };
             console.log('New state:', newState);
             return newState;
@@ -334,17 +300,6 @@ export default function ProfilePage({ businessId }) {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      // For now, just logout - actual account deletion would need backend implementation
-      await logout();
-      setShowDeleteConfirm(false);
-      // TODO: Implement actual account deletion logic
-    } catch (error) {
-      console.error('Failed to delete account:', error);
-    }
-  };
-
   const { loading, error, businesses, usage } = state;
 
   const remainingPrompts = Math.max(
@@ -384,19 +339,6 @@ export default function ProfilePage({ businessId }) {
                   <RefreshCcw className="h-4 w-4" />
                 )}
                 <span>{isRefreshing ? (isHebrew ? "טוען..." : "Loading...") : (isHebrew ? "רענן" : "Refresh")}</span>
-              </Button>
-              
-              <Button
-                onClick={downloadDatabaseJSON}
-                variant="outline"
-                className={`inline-flex items-center gap-2 rounded-xl border-2 border-green-500 text-green-600 hover:bg-green-50 px-6 py-2 shadow-md transition hover:shadow-lg ${
-                  isRTL ? "flex-row-reverse" : ""
-                }`}
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>{isHebrew ? "הורד JSON" : "Download JSON"}</span>
               </Button>
             </div>
           ) : null
@@ -439,7 +381,7 @@ export default function ProfilePage({ businessId }) {
               </div>
             ) : (
               <div className="space-y-6">
-                {/* Primary Business Section */}
+
                 {businesses.filter(b => b.isPrimary).length > 0 && (
                   <div className="space-y-4">
                     <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -496,7 +438,7 @@ export default function ProfilePage({ businessId }) {
                   </div>
                 )}
 
-                {/* Secondary Businesses Section */}
+
                 {businesses.filter(b => !b.isPrimary).length > 0 && (
                   <div className="space-y-4">
                     <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -602,7 +544,7 @@ export default function ProfilePage({ businessId }) {
         </Card>
       </div>
 
-      {/* Account Actions */}
+
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur">
         <CardHeader className={`${isRTL ? "text-right" : ""}`}>
           <CardTitle className="text-lg font-semibold text-slate-900">
@@ -613,25 +555,17 @@ export default function ProfilePage({ businessId }) {
           <div className={`flex gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
             <Button
               onClick={() => setShowLogoutConfirm(true)}
-              variant="outline"
-              className="inline-flex items-center gap-2 border-slate-300 text-slate-700 hover:bg-slate-100"
-            >
-              <LogOut className="h-4 w-4" />
-              {isHebrew ? "התנתק" : "Disconnect"}
-            </Button>
-            <Button
-              onClick={() => setShowDeleteConfirm(true)}
               variant="destructive"
               className="inline-flex items-center gap-2 bg-red-600 text-white hover:bg-red-700"
             >
-              <Trash2 className="h-4 w-4" />
-              {isHebrew ? "מחק חשבון" : "Delete Account"}
+              <LogOut className="h-4 w-4" />
+              {isHebrew ? "התנתק" : "Disconnect"}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Logout Confirmation Dialog */}
+
       <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -680,55 +614,6 @@ export default function ProfilePage({ businessId }) {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Account Confirmation Dialog */}
-      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-slate-900">
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-                <span className="hidden sm:inline">
-                  {isHebrew ? "האם אתה בטוח שברצונך למחוק את החשבון?" : "Are you sure you want to delete your account?"}
-                </span>
-                <span className="sm:hidden">
-                  {isHebrew ? "מחיקת חשבון?" : "Delete Account?"}
-                </span>
-              </DialogTitle>
-              <DialogClose asChild>
-                <button
-                  className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-                  aria-label="Close"
-                >
-                  <X className="h-4 w-4" />
-                  <span className="sr-only">Close</span>
-                </button>
-              </DialogClose>
-            </div>
-            <DialogDescription className="text-sm text-slate-600">
-              {isHebrew 
-                ? "פעולה זו לא ניתנת לביטול. כל הנתונים שלך יימחקו לצמיתות." 
-                : "This action cannot be undone. All your data will be permanently deleted."
-              }
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteConfirm(false)}
-              className="h-12 sm:h-12 px-4 sm:px-6 text-base text-slate-500 hover:text-slate-700 flex-1 sm:flex-none"
-            >
-              {isHebrew ? "ביטול" : "Cancel"}
-            </Button>
-            <Button
-              onClick={handleDeleteAccount}
-              variant="destructive"
-              className="h-12 sm:h-12 px-4 sm:px-6 text-base bg-red-600 hover:bg-red-700 text-white flex-1 sm:flex-none"
-            >
-              {isHebrew ? "מחק חשבון" : "Delete Account"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

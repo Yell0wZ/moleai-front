@@ -3,77 +3,6 @@
 @tailwind utilities;
 
 
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
-
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -157,9 +86,7 @@ button:focus-visible {
   }
 }
 
-/* ===== RESPONSIVE OPTIMIZATIONS FOR MEDIUM SCREENS (1024px-1600px) ===== */
 
-/* Business Profile - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .business-profile-desktop-shift,
   .profile-page-desktop-shift {
@@ -188,7 +115,6 @@ button:focus-visible {
   }
 }
 
-/* Avatar/Persona Page - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .avatar-page-desktop-shift {
     transform: translateX(-30px) !important;
@@ -213,7 +139,6 @@ button:focus-visible {
   }
 }
 
-/* Prompt Page - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .prompt-page-desktop-shift {
     transform: translateX(-40px) !important;
@@ -238,7 +163,6 @@ button:focus-visible {
   }
 }
 
-/* Competitor Page - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .competitor-page-desktop-shift {
     transform: translateX(-30px) scale(0.98) !important;
@@ -263,7 +187,6 @@ button:focus-visible {
   }
 }
 
-/* Analytics Page - Responsive positioning */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .analytics-page-desktop-shift {
     transform: translateX(-30px) !important;
@@ -288,14 +211,13 @@ button:focus-visible {
   }
 }
 
-/* Persona Cards - Responsive scaling */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .persona-card {
     transform: scale(0.95) !important;
   }
   
   .avatar-page-desktop-shift .grid {
-    gap: 0.75rem !important; /* 12px */
+    gap: 0.75rem !important;
   }
 }
 
@@ -305,7 +227,7 @@ button:focus-visible {
   }
   
   .avatar-page-desktop-shift .grid {
-    gap: 0.5rem !important; /* 8px */
+    gap: 0.5rem !important;
   }
 }
 
@@ -315,7 +237,7 @@ button:focus-visible {
   }
   
   .avatar-page-desktop-shift .grid {
-    gap: 1rem !important; /* 16px */
+    gap: 1rem !important;
   }
 }
 
@@ -325,15 +247,12 @@ button:focus-visible {
   }
   
   .avatar-page-desktop-shift .grid {
-    gap: 1.5rem !important; /* 24px */
+    gap: 1.5rem !important;
   }
 }
 
-/* ===== HEBREW PERSONA CARDS OPTIMIZATION FOR 14-INCH SCREENS ===== */
-/* Enhanced persona card styling for Hebrew on 14-inch screens */
 @media (min-width: 1366px) and (max-width: 1600px) {
   [dir="rtl"] .persona-card {
-    /* Optimize card dimensions for 14-inch screens - make them narrower and smaller */
     min-height: 260px !important;
     max-height: 300px !important;
     transform: scale(0.85) translateX(-30px) !important;
@@ -343,7 +262,6 @@ button:focus-visible {
     margin: 0 auto !important;
   }
   
-  /* Optimize card content for Hebrew text */
   [dir="rtl"] .persona-card .card-content {
     padding: 0.75rem !important;
     min-height: 180px !important;
@@ -352,7 +270,6 @@ button:focus-visible {
     justify-content: space-between !important;
   }
   
-  /* Optimize text content for Hebrew */
   [dir="rtl"] .persona-card .card-content p {
     font-size: 0.8rem !important;
     line-height: 1.3 !important;
@@ -364,27 +281,26 @@ button:focus-visible {
     hyphens: auto !important;
   }
   
-  /* Optimize card headers for Hebrew */
   [dir="rtl"] .persona-card .card-header {
     padding: 0.5rem 0.75rem 0.25rem 0.75rem !important;
     text-align: right !important;
   }
   
-  /* Optimize card titles for Hebrew */
   [dir="rtl"] .persona-card .card-header h3 {
     text-align: right !important;
     direction: rtl !important;
     font-size: 0.9rem !important;
   }
   
-  /* Optimize job titles for Hebrew */
   [dir="rtl"] .persona-card .card-header p {
     text-align: right !important;
     direction: rtl !important;
     font-size: 0.8rem !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
-  /* Optimize section headers for Hebrew */
   [dir="rtl"] .persona-card .card-content h4 {
     text-align: right !important;
     direction: rtl !important;
@@ -392,14 +308,12 @@ button:focus-visible {
     font-weight: 600 !important;
   }
   
-  /* Optimize button layout for Hebrew */
   [dir="rtl"] .persona-card .card-content .flex {
     gap: 0.375rem !important;
     padding-top: 0.5rem !important;
     margin-top: auto !important;
   }
   
-  /* Optimize buttons for Hebrew */
   [dir="rtl"] .persona-card .card-content button {
     font-size: 0.75rem !important;
     padding: 0.375rem 0.5rem !important;
@@ -407,10 +321,7 @@ button:focus-visible {
   }
 }
 
-/* ===== SPECIFIC ADJUSTMENTS FOR 1466x912 SCREEN SIZE ===== */
-/* English site only - move content 20px to the right */
 @media (min-width: 1466px) and (max-width: 1466px) and (min-height: 912px) and (max-height: 912px) {
-  /* Only apply to English site (LTR direction) */
   [dir="ltr"] .business-profile-desktop-shift,
   [dir="ltr"] .profile-page-desktop-shift {
     transform: translateX(20px) !important;
@@ -433,9 +344,7 @@ button:focus-visible {
   }
 }
 
-/* ===== 14-INCH SCREEN ADJUSTMENTS (1024px-1600px) ===== */
 @media (min-width: 1024px) and (max-width: 1600px) {
-  /* Only apply to English site (LTR direction) */
   [dir="ltr"] .business-profile-desktop-shift,
   [dir="ltr"] .profile-page-desktop-shift {
     transform: translateX(10px) !important;
@@ -457,7 +366,6 @@ button:focus-visible {
     transform: translateX(10px) !important;
   }
   
-  /* Only apply to Hebrew site (RTL direction) - shift 80px left */
   [dir="rtl"] .business-profile-desktop-shift,
   [dir="rtl"] .profile-page-desktop-shift {
     transform: translateX(-180px) !important;
@@ -480,69 +388,54 @@ button:focus-visible {
   }
 }
 
-/* ===== HIDE SIDEBAR GAP ELEMENT IN HEBREW ===== */
-/* Hide the sidebar gap element in Hebrew site only */
 [dir="rtl"] .relative.h-svh.w-\[--sidebar-width\].bg-transparent {
   display: none !important;
 }
 
-/* ===== FORCE PERSONA CARD WIDTH IN HEBREW ===== */
-/* Force all persona cards to be 300px wide in Hebrew */
 [dir="rtl"] .persona-card {
-  width: 300px !important;
-  max-width: 300px !important;
-  min-width: 300px !important;
-}
-
-/* ===== SHIFT PERSONA CARDS 30PX LEFT IN HEBREW ===== */
-/* Shift only persona cards 30px left in Hebrew */
-[dir="rtl"] .persona-card {
-  transform: translateX(-30px) !important;
-}
-
-/* ===== REDUCE GRID GAPS IN HEBREW ===== */
-/* Reduce gaps between grid columns in Hebrew */
-[dir="rtl"] .grid {
-  gap: 0.5rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
 }
 
 [dir="rtl"] .avatar-page-desktop-shift .grid {
-  gap: 0.25rem !important;
+  gap: 1rem !important;
 }
 
-/* ===== SHIFT AND SCALE ALL ELEMENTS IN HEBREW ===== */
-/* Shift all page elements 110px left and scale down slightly in Hebrew */
+@media (min-width: 640px) {
+  [dir="rtl"] .avatar-page-desktop-shift .grid {
+    gap: 1.5rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  [dir="rtl"] .avatar-page-desktop-shift .grid {
+    gap: 1.5rem !important;
+  }
+}
+
 [dir="rtl"] .avatar-page-desktop-shift {
   transform: translateX(-110px) scale(0.95) !important;
 }
 
-/* ===== AVATAR PAGE RESPONSIVE FOR HEBREW 14-INCH SCREENS ===== */
-/* Make avatar page responsive like English version on 14-inch screens in Hebrew */
 @media (min-width: 1024px) and (max-width: 1600px) {
   [dir="rtl"] .avatar-page-desktop-shift {
-    /* Shift 110px left and scale down for Hebrew */
     transform: translateX(-110px) scale(0.95) !important;
-    /* Use full width like English */
     max-width: 95% !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
   }
   
-  /* Apply reduced gap between columns for Hebrew */
   [dir="rtl"] .avatar-page-desktop-shift .grid {
-    gap: 0.5rem !important; /* Reduced gap between columns */
-    /* Force 3 columns on 14-inch screens */
+    gap: 0.5rem !important;
     grid-template-columns: repeat(3, 1fr) !important;
   }
   
-  /* Scale persona cards like in English */
   [dir="rtl"] .avatar-page-desktop-shift .persona-card {
-    transform: scale(1) !important; /* Same scale as English */
-    /* Ensure cards use full width */
+    transform: scale(1) !important;
     width: 100% !important;
   }
   
-  /* Fix persona card content to use full width */
   [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content {
     width: 100% !important;
     padding: 1rem !important;
@@ -555,136 +448,72 @@ button:focus-visible {
   }
 }
 
-/* ===== ENHANCED 14-INCH SCREEN OPTIMIZATIONS FOR HEBREW AVATAR PAGE ===== */
-/* Specific optimizations for 14-inch screens (1366px-1600px) in Hebrew */
-@media (min-width: 1366px) and (max-width: 1600px) {
+@media (max-width: 639px) {
   [dir="rtl"] .avatar-page-desktop-shift {
-    /* Shift 110px left and scale down for 14-inch screens */
-    transform: translateX(-110px) scale(0.95) !important;
-    max-width: 100% !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    padding: 1rem !important;
+    transform: none !important;
   }
   
-  /* Optimize grid for 14-inch screens - use narrower cards with reduced gaps */
   [dir="rtl"] .avatar-page-desktop-shift .grid {
-    gap: 0.25rem !important; /* Very small gap between columns */
-    /* Use 3 columns but with narrower cards */
-    grid-template-columns: repeat(3, 1fr) !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    gap: 1rem !important;
+    grid-template-columns: 1fr !important;
   }
   
-  /* Make persona cards narrower and smaller for 14-inch screens */
   [dir="rtl"] .avatar-page-desktop-shift .persona-card {
-    transform: scale(0.85) translateX(-30px) !important;
-    width: 300px !important;
-    max-width: 300px !important;
-    min-width: 300px !important;
-    min-height: 260px !important;
-    margin: 0 auto !important;
-  }
-  
-  /* Optimize card content spacing for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content {
-    padding: 0.75rem !important;
-    min-height: 180px !important;
-  }
-  
-  /* Optimize text content for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content p {
-    font-size: 0.8rem !important;
-    line-height: 1.3 !important;
     width: 100% !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-  }
-  
-  /* Optimize card headers for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-header {
-    padding: 0.5rem 0.75rem 0.25rem 0.75rem !important;
-  }
-  
-  /* Optimize card titles for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-header h3 {
-    font-size: 0.9rem !important;
-  }
-  
-  /* Optimize job titles for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-header p {
-    font-size: 0.8rem !important;
-  }
-  
-  /* Optimize section headers for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content h4 {
-    font-size: 0.8rem !important;
-  }
-  
-  /* Optimize button spacing for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content .flex {
-    gap: 0.375rem !important;
-    padding-top: 0.5rem !important;
-  }
-  
-  /* Optimize buttons for narrower cards */
-  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content button {
-    font-size: 0.75rem !important;
-    padding: 0.375rem 0.5rem !important;
-    min-height: 32px !important;
-  }
-  
-  /* Optimize page header buttons for Hebrew on 14-inch screens */
-  [dir="rtl"] .avatar-page-desktop-shift .flex.flex-col.gap-3 {
-    gap: 0.75rem !important;
-    flex-direction: row-reverse !important;
-  }
-  
-  /* Optimize header buttons sizing - make them smaller */
-  [dir="rtl"] .avatar-page-desktop-shift button {
-    height: 44px !important;
-    padding: 0.625rem 1rem !important;
-    font-size: 0.8rem !important;
-    min-width: 120px !important;
-    transform: scale(0.95) !important;
-  }
-  
-  /* Optimize page header spacing */
-  [dir="rtl"] .avatar-page-desktop-shift .space-y-6 {
-    gap: 1.5rem !important;
-  }
-  
-  /* Optimize empty state for Hebrew */
-  [dir="rtl"] .avatar-page-desktop-shift .text-center {
-    text-align: center !important;
-  }
-  
-  [dir="rtl"] .avatar-page-desktop-shift .text-center h3 {
-    font-size: 1.25rem !important;
-    margin-bottom: 0.75rem !important;
-  }
-  
-  [dir="rtl"] .avatar-page-desktop-shift .text-center p {
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    margin-bottom: 1.5rem !important;
-  }
-  
-  /* Optimize empty state buttons */
-  [dir="rtl"] .avatar-page-desktop-shift .text-center .flex {
-    gap: 0.75rem !important;
-    flex-direction: row-reverse !important;
-  }
-  
-  [dir="rtl"] .avatar-page-desktop-shift .text-center button {
-    height: 48px !important;
-    padding: 0.75rem 1.5rem !important;
-    font-size: 0.875rem !important;
+    max-width: 100% !important;
+    transform: none !important;
   }
 }
 
-/* ===== PERSONA CARD BLUE BAR POSITIONING ===== */
-/* Ensure blue bar stays on top border at all screen sizes */
+@media (min-width: 640px) and (max-width: 1023px) {
+  [dir="rtl"] .avatar-page-desktop-shift {
+    padding: 1.5rem !important;
+    transform: none !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .grid {
+    gap: 1.5rem !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content {
+    padding: 1rem !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content p {
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-header h3 {
+    font-size: 1rem !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-header p {
+    font-size: 0.875rem !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content h4 {
+    font-size: 0.875rem !important;
+  }
+  
+  [dir="rtl"] .avatar-page-desktop-shift .persona-card .card-content button {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
 .persona-card {
   position: relative;
 }
@@ -703,7 +532,6 @@ button:focus-visible {
   margin-top: 0.5rem !important;
 }
 
-/* Ensure persona card content uses full width */
 .persona-card .card-content {
   width: 100% !important;
   padding: 1rem !important;
@@ -723,9 +551,7 @@ button:focus-visible {
   width: 100% !important;
 }
 
-/* ===== MEDIUM SCREEN RESPONSIVE OPTIMIZATIONS ===== */
 
-/* Tablet and small laptop optimizations */
 @media (min-width: 768px) and (max-width: 1024px) {
   .tablet-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -741,7 +567,6 @@ button:focus-visible {
   }
 }
 
-/* Laptop optimizations (1024px - 1280px) */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .laptop-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -756,13 +581,11 @@ button:focus-visible {
     font-size: 0.98rem;
   }
   
-  /* Optimize sidebar for laptop screens */
   .sidebar {
     width: 260px;
   }
 }
 
-/* Large laptop optimizations (1280px - 1366px) */
 @media (min-width: 1280px) and (max-width: 1366px) {
   .laptop-lg-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -777,13 +600,11 @@ button:focus-visible {
     font-size: 1rem;
   }
   
-  /* Optimize sidebar for large laptop screens */
   .sidebar {
     width: 270px;
   }
 }
 
-/* Desktop optimizations (1366px - 1440px) */
 @media (min-width: 1366px) and (max-width: 1440px) {
   .desktop-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -798,13 +619,11 @@ button:focus-visible {
     font-size: 1rem;
   }
   
-  /* Optimize sidebar for desktop screens */
   .sidebar {
     width: 280px;
   }
 }
 
-/* Large desktop optimizations (1440px+) */
 @media (min-width: 1440px) {
   .desktop-lg-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -819,13 +638,11 @@ button:focus-visible {
     font-size: 1.05rem;
   }
   
-  /* Optimize sidebar for large desktop screens */
   .sidebar {
     width: 280px;
   }
 }
 
-/* Touch and cursor optimization for medium screens */
 @media (min-width: 768px) and (max-width: 1600px) {
   .touch-optimized {
     min-height: 44px;
@@ -838,19 +655,16 @@ button:focus-visible {
     transition: transform 0.2s ease-in-out;
   }
   
-  /* Better button spacing for touch */
   .button-group {
     gap: 0.75rem;
   }
   
-  /* Optimize form inputs for touch */
   .form-input {
     min-height: 48px;
     padding: 0.75rem 1rem;
   }
 }
 
-/* Grid responsive improvements */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .responsive-grid-2 {
     grid-template-columns: repeat(2, 1fr);
@@ -881,7 +695,6 @@ button:focus-visible {
   }
 }
 
-/* Card responsive improvements */
 @media (min-width: 1024px) and (max-width: 1280px) {
   .responsive-card {
     padding: 1.5rem;
@@ -913,4 +726,22 @@ button:focus-visible {
   .responsive-card-title {
     font-size: 1.5rem;
   }
+}
+
+/* Recharts text visibility and spacing */
+.recharts-xAxis .recharts-cartesian-axis-tick {
+  overflow: visible !important;
+}
+
+.recharts-xAxis .recharts-cartesian-axis-tick text {
+  overflow: visible !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100px;
+  display: block;
+}
+
+[dir="rtl"] .recharts-xAxis .recharts-cartesian-axis-tick text {
+  text-anchor: middle !important;
+  direction: rtl;
 }

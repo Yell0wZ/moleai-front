@@ -93,13 +93,13 @@ export default function WordCloud({ prompts, businessId }) {
             <div 
               className={`overflow-y-auto p-4 ${isRTL ? 'text-right' : ''}`}
               style={{
-                scrollbarWidth: 'none', /* Firefox */
-                msOverflowStyle: 'none', /* Internet Explorer 10+ */
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
               }}
             >
               <style jsx>{`
                 div::-webkit-scrollbar {
-                  display: none; /* Chrome, Safari, Opera */
+                  display: none;
                 }
               `}</style>
               <div className={`flex flex-wrap gap-2 justify-center items-start ${isRTL ? 'text-right' : ''}`}>

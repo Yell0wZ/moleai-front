@@ -293,8 +293,8 @@ export const Persona = {
       
       // Add businessId to the URL if provided (for secondary businesses)
       const url = businessId 
-        ? `https://deletepersona-thg3z73fma-uc.a.run.app/personas/${id}?businessId=${businessId}`
-        : `https://deletepersona-thg3z73fma-uc.a.run.app/personas/${id}`;
+        ? `https://deletepersona-p54weh4vrq-uc.a.run.app/personas/${id}?businessId=${businessId}`
+        : `https://deletepersona-p54weh4vrq-uc.a.run.app/personas/${id}`;
       
       await PersonaAPI.delete(uid, id, url);
       return true;

@@ -20,7 +20,7 @@ export default function GeneratePersonasModal({
   onPersonasGenerated,
   businessId = null
 }) {
-  const { isRTL, isHebrew } = useLanguage();
+  const { isRTL, isHebrew, t } = useLanguage();
   const [personaCount, setPersonaCount] = useState(3);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState("");
@@ -192,16 +192,12 @@ export default function GeneratePersonasModal({
       
     } catch (error) {
       console.error("Error generating personas:", error);
-      let errorMessage = isHebrew ? "יצירת האווטארים נכשלה." : "Failed to generate avatars.";
+      let errorMessage = t('errors.generateAvatarsFailed');
       
       if (error.message && error.message.includes('parse')) {
-        errorMessage = isHebrew 
-          ? "שגיאה בעיבוד תגובת ה-AI. אנא ודא שפרופיל העסק שלך מלא עם שם עסק, תעשייה ומוצרים/שירותים. אנא נסה שוב."
-          : "Error processing AI response. Please ensure your business profile is complete with business name, industry, and products/services. Please try again.";
+        errorMessage = t('errors.aiProcessingFailed');
       } else if (error.message && error.message.includes('not found')) {
-        errorMessage = isHebrew 
-          ? "פרופיל העסק לא נמצא. אנא צור פרופיל עסק תחילה."
-          : "Business profile not found. Please create a business profile first.";
+        errorMessage = t('errors.businessProfileNotFound');
       }
       
       // Show error in a styled modal instead of browser alert
@@ -245,15 +241,15 @@ export default function GeneratePersonasModal({
                 {isHebrew ? "מספר אווטארים ליצור" : "Number of Avatars to Generate"}
               </Label>
               
-              {/* Slider Container */}
+
               <div className="relative">
-                {/* Slider Track */}
+
                 <div 
                   ref={sliderRef}
                   className="relative h-2 bg-slate-200 rounded-full cursor-pointer"
                   onClick={handleTrackClick}
                 >
-                  {/* Active Track */}
+
                   <div 
                     className="absolute top-0 h-2 bg-slate-900 rounded-full transition-all duration-200"
                     style={{ 
@@ -262,7 +258,7 @@ export default function GeneratePersonasModal({
                     }}
                   />
                   
-                  {/* Slider Handle */}
+
                   <div
                     className={`absolute top-1/2 w-6 h-6 bg-white border-2 border-slate-900 rounded-full shadow-lg transform -translate-y-1/2 cursor-pointer transition-all duration-200 hover:scale-110 ${isDragging ? 'scale-110' : ''}`}
                     style={{ 
@@ -274,17 +270,15 @@ export default function GeneratePersonasModal({
                   />
                 </div>
                 
-                {/* Labels */}
+
                 <div className="flex justify-between mt-4 text-xs text-slate-500">
-                  <span className="text-center">1</span>
-                  <span className="text-center">2</span>
-                  <span className="text-center">3</span>
-                  <span className="text-center">4</span>
-                  <span className="text-center">5</span>
+                  {(isHebrew ? ['5','4','3','2','1'] : ['1','2','3','4','5']).map((label) => (
+                    <span key={label} className="text-center">{label}</span>
+                  ))}
                 </div>
               </div>
               
-              {/* Current Value Display */}
+
               <div className="mt-4 text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-slate-100 rounded-full">
                   <span className="text-lg font-semibold text-slate-900">{personaCount}</span>
@@ -335,7 +329,7 @@ export default function GeneratePersonasModal({
             </Button>
           </DialogFooter>
           
-          {/* Error Message */}
+
           {errorMessage && (
             <div className="px-6 pb-4">
               <div className={`flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg ${isRTL ? 'text-right' : ''}`}>
