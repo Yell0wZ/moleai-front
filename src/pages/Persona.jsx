@@ -3,7 +3,7 @@ import { Persona } from "@/api/entities";
 import { BusinessProfile } from "@/api/entities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Plus, Sparkles, User, Edit, Building2 } from "lucide-react";
+import { Users, Plus, Sparkles, User, Edit, Building2, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -172,17 +172,17 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
       : "grid grid-cols-1 gap-4 sm:gap-6 mx-auto max-w-3xl";
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 avatar-page-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing">
-      <PageHeader
-        icon={<Users className="w-8 h-8" />}
-        title={t('personas.title')}
-        subtitle={t('personas.subtitle')}
-        actions={headerActions}
-        isRTL={isRTL}
-        className="max-w-5xl mx-auto"
-        showOnMobile={false}
-      />
-
+    <>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 avatar-page-desktop-shift laptop-spacing laptop-lg-spacing desktop-spacing desktop-lg-spacing">
+        <PageHeader
+          icon={<Users className="w-8 h-8" />}
+          title={t('personas.title')}
+          subtitle={t('personas.subtitle')}
+          actions={headerActions}
+          isRTL={isRTL}
+          className="max-w-5xl mx-auto"
+          showOnMobile={false}
+        />
 
       <div className="block md:hidden">
         {headerActions}
@@ -262,69 +262,82 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
       />
 
 
-      {deleteModal.isOpen && deleteModal.persona && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {isHebrew ? "מחיקת אווטאר" : "Delete Avatar"}
-              </h3>
-            </div>
-            
-            <p className="text-gray-600 mb-6">
-              {isHebrew 
-                ? (
-                  <>
-                    האם אתה בטוח שברצונך למחוק את האווטאר "{deleteModal.persona.name}"?{" "}
-                    <span className="font-semibold text-red-600">פעולה זו לא ניתנת לביטול.</span>
-                  </>
-                )
-                : (
-                  <>
-                    Are you sure you want to delete the avatar "{deleteModal.persona.name}"?<br></br>
-                    <span className="font-semibold text-red-600">This action cannot be undone.</span>
-                  </>
-                )
-              }
-            </p>
-            
-            <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Button
-                onClick={cancelDelete}
-                variant="outline"
-                className="flex-1"
-                disabled={deleteModal.isDeleting}
-              >
-                {isHebrew ? "ביטול" : "Cancel"}
-              </Button>
-              <Button
-                onClick={confirmDelete}
-                variant="destructive"
-                className="flex-1"
-                disabled={deleteModal.isDeleting}
-              >
-                {deleteModal.isDeleting ? (
-                  <span className="flex items-center gap-2">
-                    {isHebrew ? (
-                      <>
-                        <Lordicon size="sm" variant="white" />
-                        מוחק...
-                      </>
-                    ) : (
-                      <>
-                        <Lordicon size="sm" variant="white" />
-                        Deleting...
-                      </>
-                    )}
-                  </span>
-                ) : (
-                  isHebrew ? "מחק" : "Delete"
-                )}
-              </Button>
+        {deleteModal.isOpen && deleteModal.persona && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {isHebrew ? "מחיקת אווטאר" : "Delete Avatar"}
+                </h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                {isHebrew 
+                  ? (
+                    <>
+                      האם אתה בטוח שברצונך למחוק את האווטאר "{deleteModal.persona.name}"?{" "}
+                      <span className="font-semibold text-red-600">פעולה זו לא ניתנת לביטול.</span>
+                    </>
+                  )
+                  : (
+                    <>
+                      Are you sure you want to delete the avatar "{deleteModal.persona.name}"?<br></br>
+                      <span className="font-semibold text-red-600">This action cannot be undone.</span>
+                    </>
+                  )
+                }
+              </p>
+              
+              <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <Button
+                  onClick={cancelDelete}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={deleteModal.isDeleting}
+                >
+                  {isHebrew ? "ביטול" : "Cancel"}
+                </Button>
+                <Button
+                  onClick={confirmDelete}
+                  variant="destructive"
+                  className="flex-1"
+                  disabled={deleteModal.isDeleting}
+                >
+                  {deleteModal.isDeleting ? (
+                    <span className="flex items-center gap-2">
+                      {isHebrew ? (
+                        <>
+                          <Lordicon size="sm" variant="white" />
+                          מוחק...
+                        </>
+                      ) : (
+                        <>
+                          <Lordicon size="sm" variant="white" />
+                          Deleting...
+                        </>
+                      )}
+                    </span>
+                  ) : (
+                    isHebrew ? "מחק" : "Delete"
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      <a
+        href="mailto:yahal.even21@gmail.com"
+        className={`fixed bottom-6 ${isHebrew ? 'left-6' : 'right-6'} z-40 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-2xl w-14 h-14 flex items-center justify-center transition transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500`}
+        title={isHebrew ? "שליחת מייל לצוות Mole.AI" : "Email Mole.AI team"}
+        aria-label={isHebrew ? "פתח מייל חדש לכתובת yahal.even21@gmail.com" : "Compose email to yahal.even21@gmail.com"}
+      >
+        <Mail className="w-6 h-6" />
+        <span className="sr-only">
+          {isHebrew ? "שליחת מייל לכתובת yahal.even21@gmail.com" : "Email yahal.even21@gmail.com"}
+        </span>
+      </a>
+    </>
   );
 }
