@@ -1290,7 +1290,7 @@ function LayoutContent({ children, currentPageName, businessId }) {
               <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end text-right' : 'justify-start text-left'}`}>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
                   <h2 className={`font-bold text-gray-900 text-lg ${isRTL ? 'text-right' : 'text-left'}`}>
-                    Mole.AI
+                    Mole AI
                   </h2>
                   <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse justify-end' : 'justify-start'}`}>
                     <Sparkles className="w-3 h-3 text-sky-500" />
