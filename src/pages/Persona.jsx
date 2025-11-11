@@ -3,7 +3,7 @@ import { Persona } from "@/api/entities";
 import { BusinessProfile } from "@/api/entities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Plus, Sparkles, User, Edit, Building2, Mail } from "lucide-react";
+import { Users, Plus, Sparkles, User, Edit, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -326,18 +326,6 @@ export default function PersonaPage({ businessId, refreshBusinessData }) {
           </div>
         )}
       </div>
-
-      <a
-        href="mailto:yahal.even21@gmail.com"
-        className={`fixed bottom-6 ${isHebrew ? 'left-6' : 'right-6'} z-40 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-2xl w-14 h-14 flex items-center justify-center transition transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500`}
-        title={isHebrew ? "שליחת מייל לצוות Mole.AI" : "Email Mole.AI team"}
-        aria-label={isHebrew ? "פתח מייל חדש לכתובת yahal.even21@gmail.com" : "Compose email to yahal.even21@gmail.com"}
-      >
-        <Mail className="w-6 h-6" />
-        <span className="sr-only">
-          {isHebrew ? "שליחת מייל לכתובת yahal.even21@gmail.com" : "Email yahal.even21@gmail.com"}
-        </span>
-      </a>
     </>
   );
 }

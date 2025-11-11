@@ -82,6 +82,7 @@ const translations = {
 
     // Layout
     'layout.businessFallback': 'My Business',
+    'layout.contactSupport': 'Contact Us',
     'layout.businessLoading': 'Loading businesses...',
     'layout.businessUnavailable': 'No businesses available',
     'layout.businessManageCaption': 'Manage businesses',
@@ -362,6 +363,7 @@ const translations = {
 
     // Layout
     'layout.businessFallback': 'העסק שלי',
+    'layout.contactSupport': 'צור קשר',
     'layout.businessLoading': 'טוען עסקים...',
     'layout.businessUnavailable': 'לא נמצאו עסקים',
     'layout.businessManageCaption': 'נהל עסקים',

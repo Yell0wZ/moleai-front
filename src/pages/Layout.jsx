@@ -13,7 +13,8 @@ import {
   LogOut,
   UserRound,
   Plus,
-  X
+  X,
+  Mail
 } from "lucide-react";
 import {
   Sidebar,
@@ -70,6 +71,8 @@ function LayoutContent({ children, currentPageName, businessId }) {
   const [isCreateBusinessModalOpen, setIsCreateBusinessModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [deleteBusinessModal, setDeleteBusinessModal] = useState({ isOpen: false, businessId: null, businessName: '' });
+  const contactLabel = t('layout.contactSupport');
+  const contactEmailHref = "mailto:yahal.even21@gmail.com";
 
   // Load language from database when component mounts
   useEffect(() => {
@@ -802,6 +805,18 @@ function LayoutContent({ children, currentPageName, businessId }) {
           50% { transform: translateY(-10px); }
         }
 
+        .contact-fab {
+          position: fixed;
+          bottom: 1.5rem;
+          z-index: 60;
+        }
+        
+        @media (max-width: 768px) {
+          .contact-fab {
+            bottom: calc(var(--mobile-bottom-nav-height) + 1rem);
+          }
+        }
+
 
         [dir="rtl"] .sidebar {
           border-left: 1px solid rgba(255, 255, 255, 0.2);
@@ -1469,7 +1484,17 @@ function LayoutContent({ children, currentPageName, businessId }) {
           <BottomNavigation />
         </div>
       </SidebarProvider>
-      
+
+      <a
+        href={contactEmailHref}
+        className={`contact-fab ${isHebrew ? 'left-5' : 'right-5'} flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-500 focus-visible:outline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-300`}
+        aria-label={contactLabel}
+        title={contactLabel}
+      >
+        <Mail className="h-6 w-6" />
+        <span className="sr-only">{contactLabel}</span>
+      </a>
+
       <CreateBusinessModal
         isOpen={isCreateBusinessModalOpen}
         onClose={() => setIsCreateBusinessModalOpen(false)}
